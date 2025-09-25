@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +38,9 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   double num1 = 0;
   double num2 = 0;
 
+  int coins = 0; // 💰 Coins system
+  bool achievementUnlocked = false; // Achievement flag
+
   // ---------------- Ad Variables ----------------
   BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
@@ -47,6 +51,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   @override
   void initState() {
     super.initState();
+    _loadCoins(); // load saved coins
     _loadBannerAd();
     _loadInterstitialAd();
     _loadRewardedAd();
@@ -58,6 +63,33 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     _interstitialAd?.dispose();
     _rewardedAd?.dispose();
     super.dispose();
+  }
+
+  // ---------------- Coins Persistence ----------------
+  Future<void> _loadCoins() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      coins = prefs.getInt('coins') ?? 0;
+      achievementUnlocked = coins >= 50;
+    });
+  }
+
+  Future<void> _saveCoins() async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('coins', coins);
+
+    // Check for achievement
+    if (coins >= 50 && !achievementUnlocked) {
+      setState(() {
+        achievementUnlocked = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("🏆 Achievement Unlocked! You collected 50 coins!"),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    }
   }
 
   // ---------------- Banner Ad ----------------
@@ -125,11 +157,10 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     if (_rewardedAd != null) {
       _rewardedAd!.show(
         onUserEarnedReward: (ad, reward) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Reward earned: ${reward.amount} ${reward.type}"),
-            ),
-          );
+          setState(() {
+            coins += reward.amount.toInt(); // add reward coins
+          });
+          _saveCoins(); // save coins permanently
         },
       );
       _rewardedAd = null;
@@ -192,7 +223,23 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Calculator")),
+      appBar: AppBar(
+        title: const Text("Calculator"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Center(
+              child: Text(
+                "Coins: $coins",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Column(
         children: [
           Expanded(
@@ -243,6 +290,31 @@ class _CalculatorHomeState extends State<CalculatorHome> {
           Row(
             children: [
               buildButton("Reward AD", Colors.green), // button for Rewarded Ad
+              Expanded(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.all(20),
+                    backgroundColor: achievementUnlocked
+                        ? Colors.purple
+                        : Colors.grey,
+                  ),
+                  onPressed: achievementUnlocked
+                      ? () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "🎉 Achievement: Premium unlocked!",
+                              ),
+                            ),
+                          );
+                        }
+                      : null,
+                  child: Text(
+                    achievementUnlocked ? "Premium Achieved!" : "Premium",
+                    style: const TextStyle(fontSize: 20),
+                  ),
+                ),
+              ),
             ],
           ),
         ],
