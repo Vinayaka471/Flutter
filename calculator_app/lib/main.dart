@@ -230,7 +230,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
             padding: const EdgeInsets.all(12.0),
             child: Center(
               child: Text(
-                "Coins: $coins",
+                "Coins: ${coins.toInt()}",
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -289,7 +289,10 @@ class _CalculatorHomeState extends State<CalculatorHome> {
           ),
           Row(
             children: [
-              buildButton("Reward AD", Colors.green), // button for Rewarded Ad
+              buildButton(
+                "Reward AD",
+                _rewardedAd != null ? Colors.green : Colors.grey,
+              ), // button for Rewarded Ad
               Expanded(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
