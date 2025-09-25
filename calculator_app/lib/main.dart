@@ -1,6 +1,10 @@
-import 'package:flutter/material.dart'; // material it gives access to widgets like buttons, text, scaffold
+import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Google Mobile Ads SDK
+  await MobileAds.instance.initialize();
   runApp(const CalculatorApp());
 }
 
@@ -18,7 +22,7 @@ class CalculatorApp extends StatelessWidget {
   }
 }
 
-// ==============================Calculator Home Screen================================================
+// ============================== Calculator Home Screen ==============================
 
 class CalculatorHome extends StatefulWidget {
   const CalculatorHome({super.key});
@@ -29,10 +33,111 @@ class CalculatorHome extends StatefulWidget {
 
 class _CalculatorHomeState extends State<CalculatorHome> {
   String display = "0";
-  String operand = " ";
+  String operand = "";
   double num1 = 0;
   double num2 = 0;
 
+  // ---------------- Ad Variables ----------------
+  BannerAd? _bannerAd;
+  bool _isBannerAdReady = false;
+
+  InterstitialAd? _interstitialAd;
+  RewardedAd? _rewardedAd;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBannerAd();
+    _loadInterstitialAd();
+    _loadRewardedAd();
+  }
+
+  @override
+  void dispose() {
+    _bannerAd?.dispose();
+    _interstitialAd?.dispose();
+    _rewardedAd?.dispose();
+    super.dispose();
+  }
+
+  // ---------------- Banner Ad ----------------
+  void _loadBannerAd() {
+    _bannerAd = BannerAd(
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test Banner Ad
+      request: const AdRequest(),
+      size: AdSize.banner,
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          setState(() {
+            _isBannerAdReady = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          print('Banner failed: $error');
+        },
+      ),
+    )..load();
+  }
+
+  // ---------------- Interstitial Ad ----------------
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId:
+          'ca-app-pub-3940256099942544/1033173712', // Test Interstitial Ad
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (error) {
+          print('Interstitial failed: $error');
+        },
+      ),
+    );
+  }
+
+  void _showInterstitialAd() {
+    if (_interstitialAd != null) {
+      _interstitialAd!.show();
+      _interstitialAd = null;
+      _loadInterstitialAd(); // preload next interstitial
+    }
+  }
+
+  // ---------------- Rewarded Ad ----------------
+  void _loadRewardedAd() {
+    RewardedAd.load(
+      adUnitId: 'ca-app-pub-3940256099942544/5224354917', // Test Rewarded Ad
+      request: const AdRequest(),
+      rewardedAdLoadCallback: RewardedAdLoadCallback(
+        onAdLoaded: (ad) {
+          _rewardedAd = ad;
+        },
+        onAdFailedToLoad: (error) {
+          print('Rewarded failed: $error');
+        },
+      ),
+    );
+  }
+
+  void _showRewardedAd() {
+    if (_rewardedAd != null) {
+      _rewardedAd!.show(
+        onUserEarnedReward: (ad, reward) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Reward earned: ${reward.amount} ${reward.type}"),
+            ),
+          );
+        },
+      );
+      _rewardedAd = null;
+      _loadRewardedAd(); // preload next rewarded ad
+    }
+  }
+
+  // ---------------- Calculator Logic ----------------
   void buttonPressed(String text) {
     setState(() {
       if (text == "C") {
@@ -45,6 +150,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
         operand = text;
         display = "0";
       } else if (text == "=") {
+        _showInterstitialAd(); // show ad on calculation
         num2 = double.parse(display);
         if (operand == "+") {
           display = (num1 + num2).toString();
@@ -56,6 +162,8 @@ class _CalculatorHomeState extends State<CalculatorHome> {
           display = num2 != 0 ? (num1 / num2).toString() : "Error";
         }
         operand = "";
+      } else if (text == "Reward AD") {
+        _showRewardedAd(); // show rewarded ad
       } else {
         if (display == "0") {
           display = text;
@@ -66,6 +174,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     });
   }
 
+  // ---------------- Build Calculator Buttons ----------------
   Widget buildButton(String text, Color color) {
     return Expanded(
       child: ElevatedButton(
@@ -79,6 +188,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     );
   }
 
+  // ---------------- UI ----------------
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -130,8 +240,19 @@ class _CalculatorHomeState extends State<CalculatorHome> {
               buildButton("+", Colors.orange),
             ],
           ),
+          Row(
+            children: [
+              buildButton("Reward AD", Colors.green), // button for Rewarded Ad
+            ],
+          ),
         ],
       ),
+      bottomNavigationBar: _isBannerAdReady
+          ? SizedBox(
+              height: _bannerAd!.size.height.toDouble(),
+              child: AdWidget(ad: _bannerAd!),
+            )
+          : null,
     );
   }
 }
