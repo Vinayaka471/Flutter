@@ -39,27 +39,29 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   int coins = 0;
   bool achievementUnlocked = false;
 
-  // ---------------- Ad Variables ----------------
+  // ---------------- Ads ----------------
   BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
 
+  InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
 
-  // ---------------- Cooldown ----------------
-  bool isCooldown = false;
-  int cooldownTime = 0;
+  // ---------------- Interstitial Cooldown ----------------
+  bool isInterstitialCooldown = false;
 
   @override
   void initState() {
     super.initState();
     _loadCoins();
     _loadBannerAd();
+    _loadInterstitialAd();
     _loadRewardedAd();
   }
 
   @override
   void dispose() {
     _bannerAd?.dispose();
+    _interstitialAd?.dispose();
     _rewardedAd?.dispose();
     super.dispose();
   }
@@ -93,7 +95,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   // ---------------- Banner Ad ----------------
   void _loadBannerAd() {
     _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test Banner
       request: const AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
@@ -110,10 +112,26 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     )..load();
   }
 
+  // ---------------- Interstitial Ad ----------------
+  void _loadInterstitialAd() {
+    InterstitialAd.load(
+      adUnitId: 'ca-app-pub-3940256099942544/1033173712', // Test Interstitial
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          _interstitialAd = ad;
+        },
+        onAdFailedToLoad: (error) {
+          print('Interstitial failed: $error');
+        },
+      ),
+    );
+  }
+
   // ---------------- Rewarded Ad ----------------
   void _loadRewardedAd() {
     RewardedAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/5224354917',
+      adUnitId: 'ca-app-pub-3940256099942544/5224354917', // Test Rewarded
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
@@ -143,8 +161,6 @@ class _CalculatorHomeState extends State<CalculatorHome> {
 
   // ---------------- Calculator Logic ----------------
   void buttonPressed(String text) {
-    if (isCooldown) return; // block during cooldown
-
     setState(() {
       if (text == "C") {
         display = "0";
@@ -156,21 +172,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
         operand = text;
         display = "0";
       } else if (text == "=") {
-        // Start cooldown
-        isCooldown = true;
-        cooldownTime = 30;
-        Timer.periodic(const Duration(seconds: 1), (timer) {
-          setState(() {
-            cooldownTime--;
-          });
-          if (cooldownTime <= 0) {
-            setState(() {
-              isCooldown = false;
-            });
-            timer.cancel();
-          }
-        });
-
+        // Perform calculation first
         num2 = double.parse(display);
         if (operand == "+") display = (num1 + num2).toString();
         if (operand == "-") display = (num1 - num2).toString();
@@ -178,6 +180,19 @@ class _CalculatorHomeState extends State<CalculatorHome> {
         if (operand == "/")
           display = num2 != 0 ? (num1 / num2).toString() : "Error";
         operand = "";
+
+        // Show Interstitial Ad ONLY if cooldown is over
+        if (!isInterstitialCooldown && _interstitialAd != null) {
+          _interstitialAd!.show();
+          _interstitialAd = null;
+          _loadInterstitialAd();
+
+          // Start 30-second cooldown for Interstitial Ad
+          isInterstitialCooldown = true;
+          Timer(const Duration(seconds: 30), () {
+            isInterstitialCooldown = false;
+          });
+        }
       } else if (text == "Reward AD") {
         _showRewardedAd();
       } else {
@@ -213,21 +228,13 @@ class _CalculatorHomeState extends State<CalculatorHome> {
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Center(
-              child: isCooldown
-                  ? Text(
-                      "Cooldown: $cooldownTime s",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    )
-                  : Text(
-                      "Coins: $coins",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+              child: Text(
+                "Coins: $coins",
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ],
