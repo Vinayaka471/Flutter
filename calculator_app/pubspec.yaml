@@ -1,5 +1,5 @@
-name: calculator_app
-description: "A new Flutter project with AdMob integration."
+name: kannada_calculator
+description: "Kannada Calculator with Ads and Premium"
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1

@@ -1,10 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Initialize Google Mobile Ads SDK
   await MobileAds.instance.initialize();
   runApp(const CalculatorApp());
 }
@@ -16,14 +16,12 @@ class CalculatorApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "Calculator",
+      title: "Kannada Calculator",
       theme: ThemeData(primarySwatch: Colors.red),
       home: const CalculatorHome(),
     );
   }
 }
-
-// ============================== Calculator Home Screen ==============================
 
 class CalculatorHome extends StatefulWidget {
   const CalculatorHome({super.key});
@@ -38,34 +36,35 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   double num1 = 0;
   double num2 = 0;
 
-  int coins = 0; // 💰 Coins system
-  bool achievementUnlocked = false; // Achievement flag
+  int coins = 0;
+  bool achievementUnlocked = false;
 
   // ---------------- Ad Variables ----------------
   BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
 
-  InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
+
+  // ---------------- Cooldown ----------------
+  bool isCooldown = false;
+  int cooldownTime = 0;
 
   @override
   void initState() {
     super.initState();
-    _loadCoins(); // load saved coins
+    _loadCoins();
     _loadBannerAd();
-    _loadInterstitialAd();
     _loadRewardedAd();
   }
 
   @override
   void dispose() {
     _bannerAd?.dispose();
-    _interstitialAd?.dispose();
     _rewardedAd?.dispose();
     super.dispose();
   }
 
-  // ---------------- Coins Persistence ----------------
+  // ---------------- Coins ----------------
   Future<void> _loadCoins() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -78,7 +77,6 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     final prefs = await SharedPreferences.getInstance();
     prefs.setInt('coins', coins);
 
-    // Check for achievement
     if (coins >= 50 && !achievementUnlocked) {
       setState(() {
         achievementUnlocked = true;
@@ -95,7 +93,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   // ---------------- Banner Ad ----------------
   void _loadBannerAd() {
     _bannerAd = BannerAd(
-      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test Banner Ad
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
       request: const AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
@@ -112,35 +110,10 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     )..load();
   }
 
-  // ---------------- Interstitial Ad ----------------
-  void _loadInterstitialAd() {
-    InterstitialAd.load(
-      adUnitId:
-          'ca-app-pub-3940256099942544/1033173712', // Test Interstitial Ad
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          _interstitialAd = ad;
-        },
-        onAdFailedToLoad: (error) {
-          print('Interstitial failed: $error');
-        },
-      ),
-    );
-  }
-
-  void _showInterstitialAd() {
-    if (_interstitialAd != null) {
-      _interstitialAd!.show();
-      _interstitialAd = null;
-      _loadInterstitialAd(); // preload next interstitial
-    }
-  }
-
   // ---------------- Rewarded Ad ----------------
   void _loadRewardedAd() {
     RewardedAd.load(
-      adUnitId: 'ca-app-pub-3940256099942544/5224354917', // Test Rewarded Ad
+      adUnitId: 'ca-app-pub-3940256099942544/5224354917',
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
@@ -158,18 +131,20 @@ class _CalculatorHomeState extends State<CalculatorHome> {
       _rewardedAd!.show(
         onUserEarnedReward: (ad, reward) {
           setState(() {
-            coins += reward.amount.toInt(); // add reward coins
+            coins += reward.amount.toInt();
           });
-          _saveCoins(); // save coins permanently
+          _saveCoins();
         },
       );
       _rewardedAd = null;
-      _loadRewardedAd(); // preload next rewarded ad
+      _loadRewardedAd();
     }
   }
 
   // ---------------- Calculator Logic ----------------
   void buttonPressed(String text) {
+    if (isCooldown) return; // block during cooldown
+
     setState(() {
       if (text == "C") {
         display = "0";
@@ -181,20 +156,30 @@ class _CalculatorHomeState extends State<CalculatorHome> {
         operand = text;
         display = "0";
       } else if (text == "=") {
-        _showInterstitialAd(); // show ad on calculation
+        // Start cooldown
+        isCooldown = true;
+        cooldownTime = 30;
+        Timer.periodic(const Duration(seconds: 1), (timer) {
+          setState(() {
+            cooldownTime--;
+          });
+          if (cooldownTime <= 0) {
+            setState(() {
+              isCooldown = false;
+            });
+            timer.cancel();
+          }
+        });
+
         num2 = double.parse(display);
-        if (operand == "+") {
-          display = (num1 + num2).toString();
-        } else if (operand == "-") {
-          display = (num1 - num2).toString();
-        } else if (operand == "*") {
-          display = (num1 * num2).toString();
-        } else if (operand == "/") {
+        if (operand == "+") display = (num1 + num2).toString();
+        if (operand == "-") display = (num1 - num2).toString();
+        if (operand == "*") display = (num1 * num2).toString();
+        if (operand == "/")
           display = num2 != 0 ? (num1 / num2).toString() : "Error";
-        }
         operand = "";
       } else if (text == "Reward AD") {
-        _showRewardedAd(); // show rewarded ad
+        _showRewardedAd();
       } else {
         if (display == "0") {
           display = text;
@@ -205,7 +190,6 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     });
   }
 
-  // ---------------- Build Calculator Buttons ----------------
   Widget buildButton(String text, Color color) {
     return Expanded(
       child: ElevatedButton(
@@ -224,18 +208,26 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Calculator"),
+        title: const Text("Kannada Calculator"),
         actions: [
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Center(
-              child: Text(
-                "Coins: $coins",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              child: isCooldown
+                  ? Text(
+                      "Cooldown: $cooldownTime s",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    )
+                  : Text(
+                      "Coins: $coins",
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
             ),
           ),
         ],
@@ -289,7 +281,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
           ),
           Row(
             children: [
-              buildButton("Reward AD", Colors.green), // button for Rewarded Ad
+              buildButton("Reward AD", Colors.green),
               Expanded(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
