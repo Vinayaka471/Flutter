@@ -1,0 +1,16 @@
+[
+    {
+        "id": "cat_sample_01",
+        "name": "Sample Category",
+        "description": "For testing",
+        "image": "",
+        "is_featured": true
+    },
+    {
+        "id": "cat_633bbcb1",
+        "name": "Bike",
+        "description": "Bike codes",
+        "image": "uploads\/images\/cat_633bbcb1.jpg",
+        "is_featured": false
+    }
+]

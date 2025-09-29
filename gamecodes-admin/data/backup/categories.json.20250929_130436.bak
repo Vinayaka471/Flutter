@@ -1,0 +1,9 @@
+[
+  {
+    "id": "cat_sample_01",
+    "name": "Sample Category",
+    "description": "For testing",
+    "image": "",
+    "is_featured": true
+  }
+]
