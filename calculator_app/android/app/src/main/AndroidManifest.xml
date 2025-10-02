@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
+<<<<<<< HEAD
         android:label="calculator_app"
+=======
+        android:label="Kannada Calculator"
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

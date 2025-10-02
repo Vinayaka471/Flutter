@@ -6,7 +6,11 @@ plugins {
 }
 
 android {
+<<<<<<< HEAD
     namespace = "com.example.calculator_app"
+=======
+    namespace = "com.kannada.calculator"
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -21,7 +25,11 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+<<<<<<< HEAD
         applicationId = "com.example.calculator_app"
+=======
+        applicationId = "com.kannada.calculator"
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

@@ -1,10 +1,17 @@
+<<<<<<< HEAD
+=======
+import 'dart:async';
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+<<<<<<< HEAD
   // Initialize Google Mobile Ads SDK
+=======
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
   await MobileAds.instance.initialize();
   runApp(const CalculatorApp());
 }
@@ -16,15 +23,22 @@ class CalculatorApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+<<<<<<< HEAD
       title: "Calculator",
+=======
+      title: "Kannada Calculator",
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
       theme: ThemeData(primarySwatch: Colors.red),
       home: const CalculatorHome(),
     );
   }
 }
 
+<<<<<<< HEAD
 // ============================== Calculator Home Screen ==============================
 
+=======
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
 class CalculatorHome extends StatefulWidget {
   const CalculatorHome({super.key});
 
@@ -38,20 +52,37 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   double num1 = 0;
   double num2 = 0;
 
+<<<<<<< HEAD
   int coins = 0; // 💰 Coins system
   bool achievementUnlocked = false; // Achievement flag
 
   // ---------------- Ad Variables ----------------
+=======
+  int coins = 0;
+  bool achievementUnlocked = false;
+
+  // ---------------- Ads ----------------
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
   BannerAd? _bannerAd;
   bool _isBannerAdReady = false;
 
   InterstitialAd? _interstitialAd;
   RewardedAd? _rewardedAd;
 
+<<<<<<< HEAD
   @override
   void initState() {
     super.initState();
     _loadCoins(); // load saved coins
+=======
+  // ---------------- Interstitial Cooldown ----------------
+  bool isInterstitialCooldown = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCoins();
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
     _loadBannerAd();
     _loadInterstitialAd();
     _loadRewardedAd();
@@ -65,7 +96,11 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     super.dispose();
   }
 
+<<<<<<< HEAD
   // ---------------- Coins Persistence ----------------
+=======
+  // ---------------- Coins ----------------
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
   Future<void> _loadCoins() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -78,7 +113,10 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     final prefs = await SharedPreferences.getInstance();
     prefs.setInt('coins', coins);
 
+<<<<<<< HEAD
     // Check for achievement
+=======
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
     if (coins >= 50 && !achievementUnlocked) {
       setState(() {
         achievementUnlocked = true;
@@ -95,7 +133,11 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   // ---------------- Banner Ad ----------------
   void _loadBannerAd() {
     _bannerAd = BannerAd(
+<<<<<<< HEAD
       adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test Banner Ad
+=======
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111', // Test Banner
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
       request: const AdRequest(),
       size: AdSize.banner,
       listener: BannerAdListener(
@@ -115,8 +157,12 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   // ---------------- Interstitial Ad ----------------
   void _loadInterstitialAd() {
     InterstitialAd.load(
+<<<<<<< HEAD
       adUnitId:
           'ca-app-pub-3940256099942544/1033173712', // Test Interstitial Ad
+=======
+      adUnitId: 'ca-app-pub-3940256099942544/1033173712', // Test Interstitial
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {
@@ -129,6 +175,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     );
   }
 
+<<<<<<< HEAD
   void _showInterstitialAd() {
     if (_interstitialAd != null) {
       _interstitialAd!.show();
@@ -141,6 +188,12 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   void _loadRewardedAd() {
     RewardedAd.load(
       adUnitId: 'ca-app-pub-3940256099942544/5224354917', // Test Rewarded Ad
+=======
+  // ---------------- Rewarded Ad ----------------
+  void _loadRewardedAd() {
+    RewardedAd.load(
+      adUnitId: 'ca-app-pub-3940256099942544/5224354917', // Test Rewarded
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
       request: const AdRequest(),
       rewardedAdLoadCallback: RewardedAdLoadCallback(
         onAdLoaded: (ad) {
@@ -158,6 +211,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
       _rewardedAd!.show(
         onUserEarnedReward: (ad, reward) {
           setState(() {
+<<<<<<< HEAD
             coins += reward.amount.toInt(); // add reward coins
           });
           _saveCoins(); // save coins permanently
@@ -165,6 +219,15 @@ class _CalculatorHomeState extends State<CalculatorHome> {
       );
       _rewardedAd = null;
       _loadRewardedAd(); // preload next rewarded ad
+=======
+            coins += reward.amount.toInt();
+          });
+          _saveCoins();
+        },
+      );
+      _rewardedAd = null;
+      _loadRewardedAd();
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
     }
   }
 
@@ -181,6 +244,7 @@ class _CalculatorHomeState extends State<CalculatorHome> {
         operand = text;
         display = "0";
       } else if (text == "=") {
+<<<<<<< HEAD
         _showInterstitialAd(); // show ad on calculation
         num2 = double.parse(display);
         if (operand == "+") {
@@ -195,6 +259,31 @@ class _CalculatorHomeState extends State<CalculatorHome> {
         operand = "";
       } else if (text == "Reward AD") {
         _showRewardedAd(); // show rewarded ad
+=======
+        // Perform calculation first
+        num2 = double.parse(display);
+        if (operand == "+") display = (num1 + num2).toString();
+        if (operand == "-") display = (num1 - num2).toString();
+        if (operand == "*") display = (num1 * num2).toString();
+        if (operand == "/")
+          display = num2 != 0 ? (num1 / num2).toString() : "Error";
+        operand = "";
+
+        // Show Interstitial Ad ONLY if cooldown is over
+        if (!isInterstitialCooldown && _interstitialAd != null) {
+          _interstitialAd!.show();
+          _interstitialAd = null;
+          _loadInterstitialAd();
+
+          // Start 30-second cooldown for Interstitial Ad
+          isInterstitialCooldown = true;
+          Timer(const Duration(seconds: 30), () {
+            isInterstitialCooldown = false;
+          });
+        }
+      } else if (text == "Reward AD") {
+        _showRewardedAd();
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
       } else {
         if (display == "0") {
           display = text;
@@ -205,7 +294,10 @@ class _CalculatorHomeState extends State<CalculatorHome> {
     });
   }
 
+<<<<<<< HEAD
   // ---------------- Build Calculator Buttons ----------------
+=======
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
   Widget buildButton(String text, Color color) {
     return Expanded(
       child: ElevatedButton(
@@ -224,7 +316,11 @@ class _CalculatorHomeState extends State<CalculatorHome> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+<<<<<<< HEAD
         title: const Text("Calculator"),
+=======
+        title: const Text("Kannada Calculator"),
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
         actions: [
           Padding(
             padding: const EdgeInsets.all(12.0),
@@ -289,7 +385,11 @@ class _CalculatorHomeState extends State<CalculatorHome> {
           ),
           Row(
             children: [
+<<<<<<< HEAD
               buildButton("Reward AD", Colors.green), // button for Rewarded Ad
+=======
+              buildButton("Reward AD", Colors.green),
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
               Expanded(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
