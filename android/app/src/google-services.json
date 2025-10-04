@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "682738137403",
+    "project_id": "ybt-match-ef791",
+    "storage_bucket": "ybt-match-ef791.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:682738137403:android:96d2c479f9c9226901df1e",
+        "android_client_info": {
+          "package_name": "com.youbtech.ybtmatch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "682738137403-ljkrp87145grc6hq6ls0hrpduts1qu0e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.youbtech.ybtmatch",
+            "certificate_hash": "dba44fbd7d1d1cf3fa1e5aa2004c04618b8539df"
+          }
+        },
+        {
+          "client_id": "682738137403-48hd4oc4u42qfnk46fp4sp1vu5baupgt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC50kpQ7bu1VM2MB9j8JA1R3MJauEB8Yp0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "682738137403-48hd4oc4u42qfnk46fp4sp1vu5baupgt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
