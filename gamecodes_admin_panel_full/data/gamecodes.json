@@ -1,0 +1,14 @@
+{
+  "gamecodes": [
+    {
+      "id": 1,
+      "title": "Mega Speed Bike Code",
+      "categories": [
+        "Bikes"
+      ],
+      "type": "text",
+      "content": "CODE-12345",
+      "featured": true
+    }
+  ]
+}

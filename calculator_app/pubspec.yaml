@@ -1,0 +1,49 @@
+<<<<<<< HEAD
+name: calculator_app
+description: "A new Flutter project with AdMob integration."
+=======
+name: kannada_calculator
+description: "Kannada Calculator with Ads and Premium"
+>>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Cupertino icons (default iOS-style icons)
+  cupertino_icons: ^1.0.8
+
+  # Google Mobile Ads
+  google_mobile_ads: ^6.0.0
+
+  # Shared Preferences
+  shared_preferences: ^2.3.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Latest lint rules
+  flutter_lints: ^6.0.0
+
+  # Flutter Launcher Icons
+  flutter_launcher_icons: ^0.11.0
+
+flutter:
+  uses-material-design: true
+
+  # Add assets if you have images
+  assets:
+    - assets/
+
+# ========================= Launcher Icon Configuration =========================
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"
