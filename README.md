@@ -1,4 +1,22 @@
 <<<<<<< HEAD
+# ybt_match
+
+A new Flutter project.
+
+## Getting Started
+
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
+=======
+<<<<<<< HEAD
 <a href="https://flutter.dev/">
   <h1 align="center">
     <picture>
@@ -129,3 +147,4 @@ Information on how to get started can be found in our
 =======
 # Flutter
 >>>>>>> 2410c2386ba5aac36c1a89a652707010afcf26bd
+>>>>>>> bfe318c96008c18a2dea8b1c8854f220b32d505d
