@@ -107,6 +107,90 @@ class PanchangaDataUtils {
 
   static final List<Mantra> mantras = <Mantra>[
     Mantra(
+      title: 'ಶ್ರೀ ಗಾಯತ್ರಿ ಮಂತ್ರ',
+      lines: <String>[
+        'ॐ ಭೂರ್ಭುವಸ್ಸುವಃ ।',
+        'ತತ್ಸವಿತುರ್ವರೇಣ್ಯಂ ।',
+        'ಭರ್ಗೋ ದೇವಸ್ಯ ಧೀಮಹಿ ।',
+        'ಧಿಯೋ ಯೋ ನಃ ಪ್ರಚೋದಯಾತ್ ॥',
+      ],
+      primaryColor: const Color(0xFFD97706),
+      secondaryColor: const Color(0xFFEF4444),
+    ),
+    Mantra(
+      title: 'ಶ್ರೀ ಶನೇಶ್ವರ ಸ್ತೋತ್ರ',
+      lines: <String>[
+        'ನಮಸ್ತೇ ಕೋಣಶಪೀಡಾಯ ನಮನಸ್ತೇ ಬಬ್ರುರುಪಿಣೇ ।',
+        'ನಮಸ್ತೇ ಸೂರ್ಯ ಪುತ್ರಾಯ ನಮಸ್ತೇ ಯಮಸೋದರ ॥',
+        '',
+        'ನಮೋ ಮಂಢಾಯ ಚ ಸ್ಥೂಲಾಯ ನೀಲಾಯ ಚ ಶನಯೇ ನಮಃ ।',
+        'ಪ್ರಸಾದಂ ಕುರೂ ದೇವೇಶ ದೀನಸ್ಯ ಕೃಪಯಾ ನಃ ॥',
+        '',
+        'ನಮಃ ಕ್ರೂರಾಯ ದುಷ್ಟಾಯ ದುಃಖದಾಯ ನಮೋऽಸ್ತು ತೇ ।',
+        'ಪ್ರಸಾದಂ ಕುರೂ ಮೇ ಶನೈಃ ಶನೈಃ ಶನೇಶ್ವರ ॥',
+      ],
+      primaryColor: const Color(0xFF0F172A),
+      secondaryColor: const Color(0xFF1E3A8A),
+    ),
+    Mantra(
+      title: 'ಶ್ರೀ ದುರ್ಗಾ ಸ್ತೋತ್ರ',
+      lines: <String>[
+        'ಸರ್ವಮಂಗಳು ಮಾಂಗಲ್ಯೇ ಶಿವೇ ಸರ್ವಾರ್ಥ ಸಾಧಿಕೇ ।',
+        'ಶರಣ್ಯೇ ತ್ರ್ಯಂಬಕೇ ಗೌರಿ ನಾರಾಯಣಿ ನಮೋಸ್ತು ತೇ ॥',
+        '',
+        'ಯಾ ದೇವೀ ಸರ್ವಭೂತೇಷು ಶಕ್ತಿರೂಪೇಣ ಸಂಸ್ತಿತಾ ।',
+        'ನಮಸ್ತಸ್ಯೈ ನಮಸ್ತಸ್ಯೈ ನಮಸ್ತಸ್ಯೈ ನಮೋ ನಮಃ ॥',
+        '',
+        'ಯಾ ದೇವೀ ಸರ್ವಭೂತೇಷು ಭಕ್ತಿರೂಪೇಣ ಸಂಸ್ತಿತಾ ।',
+        'ನಮಸ್ತಸ್ಯೈ ನಮಸ್ತಸ್ಯೈ ನಮಸ್ತಸ್ಯೈ ನಮೋ ನಮಃ ॥',
+      ],
+      primaryColor: const Color(0xFFFF6B2C),
+      secondaryColor: const Color(0xFFFCC419),
+    ),
+    Mantra(
+      title: 'ಶ್ರೀ ಚೌಡೇಶ್ವರಿ ಸ್ತೋತ್ರ',
+      lines: <String>[
+        'ನಮೋ ದೇವ್ಯೈ ಮಹಾದೇವ್ಯೈ ಚೌಡೇಶ್ವರ್ಯೈ ನಮೋ ನಮಃ ।',
+        'ಜಯ ಭದ್ರೇ ಮಹಾಮಾಯೆ ಚಂಡಿಕೇ ಶ್ರುಣು ಸುಪ್ರಿಯೇ ॥',
+        '',
+        'ದೇವೀಂ ಪ್ರಪದ್ಯೇ ಶರಣಂ ಭಕ್ತಾನಾಂ ರಕ್ಷಣಾಯೈ ।',
+        'ಚೌಡೇಶ್ವರಿ ನಮಸ್ತುಭ್ಯಂ ಶರಣಾಗತ ವತ್ಸಲೆ ॥',
+      ],
+      primaryColor: const Color(0xFF064E3B),
+      secondaryColor: const Color(0xFF14532D),
+    ),
+    Mantra(
+      title: 'ಶ್ರೀ ಗುರು ರಾಘವೇಂದ್ರ ಸ್ವಾಮಿ ಪ್ರಾರ್ಥನೆ',
+      lines: <String>[
+        'ಪಾಲಯ ಮಮ ರಾಘವೇಂದ್ರ ಪಾದ |',
+        'ದಾಳಯ ಮಮ ದುಃಖ ಭಾರಮ್ ॥',
+        'ಕಾಳಹರಣ ಗುರು ಕರುಣಾಸಾಗರ |',
+        'ಜೀವನ ಸಾರ್ಥಕ ತ್ವಮ್ ॥',
+        '',
+        'ತವ ಪದ ಪಂಕ್ಜ ಸೇವಾ ನಿಶಾ |',
+        'ಭವ ಭಯ ನಾಶಕ ಶ್ರೀ ಗುರುರಾಯ ॥',
+        'ಅನಂತ ಕೋಟಿ ಬ್ರಹ್ಮಾಂಡ ನಾಯಕ |',
+        'ದಯಾಮಯ ರಾಘವೇಂದ್ರಾಯ ನಮಃ ॥',
+      ],
+      primaryColor: const Color(0xFFB45309),
+      secondaryColor: const Color(0xFFF59E0B),
+    ),
+    Mantra(
+      title: 'ಶ್ರೀ ಸೂರ್ಯ ನಾರಾಯಣ ಪ್ರಾರ್ಥನೆ',
+      lines: <String>[
+        'ಓಂ ಭ್ಯಾಸ್ ಸೂರ್ಯ ನಾರಾಯಣಾಯ ನಮಃ |',
+        'ಓಂ ದಿವ್ಯ ಪ್ರಭಾತಾಯ ನಮಃ ॥',
+        'ಓಂ ಭಾಸ್ಕರಾಯ ವಿದ್ಮಹಿ |',
+        'ದಿವ್ಯ ಜ್ಯೋತಿ ಪ್ರಸಾದಯಾತ್ ॥',
+        '',
+        'ಓಂ ಸೂರ್ಯ ದೇವಾಯ ನಮಃ |',
+        'ಓಂ ಶ್ರೇಯೋಭಿವೃದ್ಧ್ಯೈ ನಮಃ ॥',
+        'ಓಂ ಜಯ ಸೂರ್ಯ ನಾರಾಯಣಾಯ ನಮಃ |',
+      ],
+      primaryColor: const Color(0xFFF97316),
+      secondaryColor: const Color(0xFFFACC15),
+    ),
+    Mantra(
       title: 'ಶ್ರೀ ಗಣೇಶ ಮಂತ್ರ',
       lines: <String>[
         'ಓಂ ಗಣಾನಾಂತ್ವಾ ಗಣಪತಿಂ ಹವಾಮಹೇ',
@@ -148,6 +232,51 @@ class PanchangaDataUtils {
       primaryColor: const Color(0xFF7C3AED),
       secondaryColor: const Color(0xFF38BDF8),
     ),
+    Mantra(
+      title: 'ಶ್ರೀ ಸರಸ್ವತಿ ಸ್ತೋತ್ರ',
+      lines: <String>[
+        'ಯಾ ಕುಂದೇಸು ತುನ್ಬಿತೇ ಸುಪ್ರಭಾತೀ',
+        'ಯಾ ಶ್ವೇತಪದ್ಮಾಂಬುಜೇ ಶುಭಂಕರಾ',
+        'ಯಾ ವಿದ್ಯಾ ಭಾಸ್ಕರೇಣ ತೇಜೋಮಯೀ',
+        'ನಮಸ್ತಸ್ಯೈ ನಮಸ್ತಸ್ಯೈ ನಮಸ್ತಸ್ಯೈ ನಮಃ',
+      ],
+      primaryColor: const Color(0xFFD6E4FF),
+      secondaryColor: const Color(0xFFEDE9FE),
+    ),
+    Mantra(
+      title: 'ಶ್ರೀ ಸಾಯಿಬಾಬಾ ಸ್ತೋತ್ರ',
+      lines: <String>[
+        'ಶ್ರಿ ಸಾಯಿ ಪ್ರಭೋ ದಯಾನಿಧೇ',
+        'ಪಾವನವಿಚಿತ್ರ ಹೃದಯ ಮೋಹನೆ',
+        'ಭಕ್ತಪೋಷಕ ಸರ್ವದಾ ಕೃಪಾಮಯ',
+        'ನಮೋ ನಮಃ ಸಾಯಿನಾಥಾಯ',
+      ],
+      primaryColor: const Color(0xFF1F2937),
+      secondaryColor: const Color(0xFF312E81),
+    ),
+    Mantra(
+      title: 'ಶ್ರೀ ವಿಷ್ಣು ಸ್ತೋತ್ರ',
+      lines: <String>[
+        'ಶಾಂತಾಕಾರಂ ಭುಜಗಶಯನಂ ಪದ್ಮನಾಭಂ ಸುರೇಶಂ',
+        'ವಿಶ್ವಾಧಾರಂ ಗಗನಸದೃಶಂ ಮೇಘವರ್ಣಂ ಶುಭಾಂಗಂ',
+        'ಲಕ್ಷ್ಮೀಕಾಂತಂ ಕಮಲನಯನಂ ಯೋಗಿಭಿರ್ಧ್ಯಾನಗಮ್ಯಂ',
+        'ವಂದೇ ವಿಷ್ಣುಂ ಭವಭಯಹರಂ ಸರ್ವಲೋಕೈಕನಾಥಂ',
+      ],
+      primaryColor: const Color(0xFF38BDF8),
+      secondaryColor: const Color(0xFFE0F2FE),
+    ),
+    Mantra(
+      title: 'ಶ್ರೀ ಪದ್ಮಾವತಿ ಸ್ತೋತ್ರ',
+      lines: <String>[
+        'ಪದ್ಮಾಲಯೇ ಶ್ರೀಪದ್ಮಾವತಿ ದೇವಿ',
+        'ಕರೂಣಾಸಾಗರೇ ಭಕ್ತ ಅಡಿಗೇ',
+        'ಅಭಯಪ್ರದಾಪಿ ತ್ವಂ ಶರಣಾಗತಾನಾಂ',
+        'ಸರ್ವಾನುಗ್ರಹಕಾರಿಣಿ ಪಾಹಿ ಮಾಂ ಸದಾ',
+      ],
+      primaryColor: const Color(0xFFF472B6),
+      secondaryColor: const Color(0xFFFDE5F2),
+    ),
+   
   ];
 
   static final Map<DateTime, PanchangaDay> _panchangaByDate = UnmodifiableMapView<DateTime, PanchangaDay>(

@@ -40,6 +40,1170 @@ class _MantraTabContent extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(height: 18),
         itemBuilder: (BuildContext context, int index) {
           final mantra = PanchangaDataUtils.mantras[index];
+          if (mantra.title == 'ಶ್ರೀ ಗಾಯತ್ರಿ ಮಂತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFFFF7AE), Color(0xFFFFD166), Color(0xFFF97316)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFFFFE082), width: 1.4),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x66FBBF24), blurRadius: 40, spreadRadius: 10, offset: Offset(0, 18)),
+                    BoxShadow(color: Color(0x33EA580C), blurRadius: 24, offset: Offset(0, 12)),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 36),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF3B0).withValues(alpha: 0.9),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: const <BoxShadow>[
+                            BoxShadow(color: Color(0x4DFBBF24), blurRadius: 18, offset: Offset(0, 8)),
+                          ],
+                        ),
+                        child: Text(
+                          'ॐ',
+                          style: GoogleFonts.notoSansKannada(fontSize: 28, fontWeight: FontWeight.w800, color: const Color(0xFFC08401), letterSpacing: 4),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        mantra.title,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: const Color(0xFFB91C1C)),
+                      ),
+                      const SizedBox(height: 20),
+                      ...mantra.lines.map(
+                        (String line) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Text(
+                            line,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w800,
+                              height: 1.45,
+                              color: const Color(0xFF7C2D12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಪದ್ಮಾವತಿ ಸ್ತೋತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFFFF7FB), Color(0xFFFCE7F3), Color(0xFFFBCFE8)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFFF9A8D4), width: 1.2),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x66F472B6), blurRadius: 30, spreadRadius: 8, offset: Offset(0, 18)),
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: <Color>[Colors.white.withValues(alpha: 0.8), Colors.transparent],
+                            radius: 0.82,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: <Color>[Color(0xFFF472B6), Color(0xFFFDA4AF)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(color: Color(0x33F472B6), blurRadius: 16, offset: Offset(0, 8)),
+                              ],
+                            ),
+                            child: Text(
+                              '🌸',
+                              style: GoogleFonts.notoSansKannada(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 3),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            mantra.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: const Color(0xFFBE185D)),
+                          ),
+                          const SizedBox(height: 18),
+                          ...mantra.lines.map(
+                            (String line) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSansKannada(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: const Color(0xFFF472B6),
+                                  shadows: const <Shadow>[
+                                    Shadow(color: Color(0x66FFFFFF), blurRadius: 8, offset: Offset(0, 2)),
+                                    Shadow(color: Color(0x33BE185D), blurRadius: 12, offset: Offset(0, 4)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಶನೇಶ್ವರ ಸ್ತೋತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 28,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFF0B1120), Color(0xFF111F4A), Color(0xFF1E3A8A)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: const Color(0xFF93C5FD).withValues(alpha: 0.35), width: 1.2),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x661E3A8A), blurRadius: 32, spreadRadius: 6, offset: Offset(0, 18)),
+                    BoxShadow(color: Color(0x4D0B1120), blurRadius: 18, offset: Offset(0, 8)),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          gradient: const LinearGradient(
+                            colors: <Color>[Color(0xFFFACC15), Color(0xFFFCD34D)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: const <BoxShadow>[
+                            BoxShadow(color: Color(0x4DFACC15), blurRadius: 16, offset: Offset(0, 8)),
+                          ],
+                        ),
+                        child: Text(
+                          '♄',
+                          style: GoogleFonts.notoSansKannada(fontSize: 26, fontWeight: FontWeight.w800, color: const Color(0xFF1E293B), letterSpacing: 3),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        mantra.title,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.notoSansKannada(fontSize: 21, fontWeight: FontWeight.w900, color: const Color(0xFFBFDBFE)),
+                      ),
+                      const SizedBox(height: 18),
+                      ...mantra.lines.map(
+                        (String line) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Text(
+                            line,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              height: 1.5,
+                              color: const Color(0xFFDBEAFE),
+                              shadows: const <Shadow>[
+                                Shadow(color: Color(0x661E3A8A), blurRadius: 8, offset: Offset(0, 2)),
+                                Shadow(color: Color(0x661E293B), blurRadius: 14, offset: Offset(0, 4)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ದುರ್ಗಾ ಸ್ತೋತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFFFFBEB), Color(0xFFFFE08A), Color(0xFFFFA94D)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFFFFE5A5), width: 1.3),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x66FDBA74), blurRadius: 34, spreadRadius: 8, offset: Offset(0, 20)),
+                    BoxShadow(color: Color(0x33EA580C), blurRadius: 20, offset: Offset(0, 10)),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          gradient: const LinearGradient(
+                            colors: <Color>[Color(0xFFFACC15), Color(0xFFF59E0B)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: const <BoxShadow>[
+                            BoxShadow(color: Color(0x4DF59E0B), blurRadius: 18, offset: Offset(0, 8)),
+                          ],
+                        ),
+                        child: Text(
+                          '🔱',
+                          style: GoogleFonts.notoSansKannada(fontSize: 28, fontWeight: FontWeight.w800, color: const Color(0xFF7C2D12), letterSpacing: 3),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        mantra.title,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.notoSansKannada(fontSize: 21, fontWeight: FontWeight.w900, color: const Color(0xFFB45309)),
+                      ),
+                      const SizedBox(height: 18),
+                      ...mantra.lines.map(
+                        (String line) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Text(
+                            line,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              height: 1.5,
+                              color: const Color(0xFF7C2D12),
+                              shadows: const <Shadow>[
+                                Shadow(color: Color(0x66EA580C), blurRadius: 8, offset: Offset(0, 2)),
+                                Shadow(color: Color(0x4DF97316), blurRadius: 14, offset: Offset(0, 4)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಚೌಡೇಶ್ವರಿ ಸ್ತೋತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 28,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFF022C22), Color(0xFF064E3B), Color(0xFF14532D)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: const Color(0xFFBBF7D0).withValues(alpha: 0.4), width: 1.2),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x6614522D), blurRadius: 32, spreadRadius: 6, offset: Offset(0, 18)),
+                    BoxShadow(color: Color(0x3314522D), blurRadius: 18, offset: Offset(0, 8)),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          gradient: const LinearGradient(
+                            colors: <Color>[Color(0xFFEAB308), Color(0xFFFACC15)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: const <BoxShadow>[
+                            BoxShadow(color: Color(0x4DEAB308), blurRadius: 16, offset: Offset(0, 8)),
+                          ],
+                        ),
+                        child: Text(
+                          '🔱',
+                          style: GoogleFonts.notoSansKannada(fontSize: 26, fontWeight: FontWeight.w800, color: const Color(0xFF1F2937), letterSpacing: 3),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        mantra.title,
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.notoSansKannada(fontSize: 21, fontWeight: FontWeight.w900, color: const Color(0xFFD1FAE5)),
+                      ),
+                      const SizedBox(height: 18),
+                      ...mantra.lines.map(
+                        (String line) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Text(
+                            line,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              height: 1.5,
+                              color: const Color(0xFFC3F0C9),
+                              shadows: const <Shadow>[
+                                Shadow(color: Color(0x66FACC15), blurRadius: 10, offset: Offset(0, 3)),
+                                Shadow(color: Color(0x6614522D), blurRadius: 14, offset: Offset(0, 4)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಗುರು ರಾಘವೇಂದ್ರ ಸ್ವಾಮಿ ಪ್ರಾರ್ಥನೆ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(26),
+              borderRadius: 32,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFFFF8E7), Color(0xFFFFE1A6), Color(0xFFF97316)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(32),
+                  border: Border.all(color: const Color(0xFFFFF0C2), width: 1.4),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x66FDBA74), blurRadius: 38, spreadRadius: 10, offset: Offset(0, 22)),
+                    BoxShadow(color: Color(0x33EA580C), blurRadius: 24, offset: Offset(0, 12)),
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: <Color>[const Color(0xFFFFF4D6).withValues(alpha: 0.85), Colors.transparent],
+                            radius: 0.8,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 36),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(26),
+                              gradient: const LinearGradient(
+                                colors: <Color>[Color(0xFFFACC15), Color(0xFFFBBF24)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(color: Color(0x4DF59E0B), blurRadius: 20, offset: Offset(0, 10)),
+                              ],
+                            ),
+                            child: Text(
+                              '🕉️',
+                              style: GoogleFonts.notoSansKannada(fontSize: 30, fontWeight: FontWeight.w800, color: const Color(0xFF7C2D12), letterSpacing: 4),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+                          Text(
+                            mantra.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: const Color(0xFF9A3412)),
+                          ),
+                          const SizedBox(height: 20),
+                          ...mantra.lines.map(
+                            (String line) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSansKannada(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: const Color(0xFF7C2D12),
+                                  shadows: const <Shadow>[
+                                    Shadow(color: Color(0x66F59E0B), blurRadius: 8, offset: Offset(0, 2)),
+                                    Shadow(color: Color(0x4DEA580C), blurRadius: 14, offset: Offset(0, 4)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಸೂರ್ಯ ನಾರಾಯಣ ಪ್ರಾರ್ಥನೆ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFFFFBCC), Color(0xFFFFD166), Color(0xFFF97316), Color(0xFFDC2626)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFFFFECB3), width: 1.3),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x66FBBF24), blurRadius: 36, spreadRadius: 9, offset: Offset(0, 20)),
+                    BoxShadow(color: Color(0x33DC2626), blurRadius: 18, offset: Offset(0, 10)),
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: <Color>[const Color(0xFFFFF3B0).withValues(alpha: 0.85), Colors.transparent],
+                            radius: 0.85,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 34),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: <Color>[Color(0xFFFACC15), Color(0xFFF97316)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(color: Color(0x4DFACC15), blurRadius: 18, offset: Offset(0, 9)),
+                              ],
+                            ),
+                            child: Text(
+                              '☀',
+                              style: GoogleFonts.notoSansKannada(fontSize: 30, fontWeight: FontWeight.w800, color: const Color(0xFF7C2D12), letterSpacing: 4),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            mantra.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: const Color(0xFFB91C1C)),
+                          ),
+                          const SizedBox(height: 18),
+                          ...mantra.lines.map(
+                            (String line) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSansKannada(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: const Color(0xFF7C2D12),
+                                  shadows: const <Shadow>[
+                                    Shadow(color: Color(0x66F97316), blurRadius: 8, offset: Offset(0, 2)),
+                                    Shadow(color: Color(0x4DDB2777), blurRadius: 14, offset: Offset(0, 4)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಗಣೇಶ ಮಂತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFFFF1F2), Color(0xFFFECACA), Color(0xFFE11D48)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFFFFCDD2), width: 1.3),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x66E11D48), blurRadius: 32, spreadRadius: 8, offset: Offset(0, 18)),
+                    BoxShadow(color: Color(0x33F97316), blurRadius: 20, offset: Offset(0, 10)),
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: <Color>[const Color(0xFFFFEBF0).withValues(alpha: 0.85), Colors.transparent],
+                            radius: 0.8,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: <Color>[Color(0xFFF97316), Color(0xFFE11D48)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(color: Color(0x4DE11D48), blurRadius: 18, offset: Offset(0, 8)),
+                              ],
+                            ),
+                            child: Text(
+                              '🐘',
+                              style: GoogleFonts.notoSansKannada(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 3),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            mantra.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: const Color(0xFFB91C1C)),
+                          ),
+                          const SizedBox(height: 18),
+                          ...mantra.lines.map(
+                            (String line) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSansKannada(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: Colors.white,
+                                  shadows: const <Shadow>[
+                                    Shadow(color: Color(0x66E11D48), blurRadius: 8, offset: Offset(0, 2)),
+                                    Shadow(color: Color(0x4DF97316), blurRadius: 14, offset: Offset(0, 4)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಹನುಮಾನ್ ಚಾಲಿಸಾ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFFFFBEB), Color(0xFFFFE08A), Color(0xFFF97316)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFFFCD34D), width: 1.3),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x66F97316), blurRadius: 32, spreadRadius: 8, offset: Offset(0, 18)),
+                    BoxShadow(color: Color(0x33FACC15), blurRadius: 18, offset: Offset(0, 10)),
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: <Color>[const Color(0xFFFFF0C2).withValues(alpha: 0.85), Colors.transparent],
+                            radius: 0.8,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: <Color>[Color(0xFFFACC15), Color(0xFFF97316)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(color: Color(0x4DF97316), blurRadius: 18, offset: Offset(0, 8)),
+                              ],
+                            ),
+                            child: Text(
+                              '🪔',
+                              style: GoogleFonts.notoSansKannada(fontSize: 28, fontWeight: FontWeight.w800, color: const Color(0xFF7C2D12), letterSpacing: 3),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            mantra.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: const Color(0xFFB45309)),
+                          ),
+                          const SizedBox(height: 18),
+                          ...mantra.lines.map(
+                            (String line) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSansKannada(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: const Color(0xFF7C2D12),
+                                  shadows: const <Shadow>[
+                                    Shadow(color: Color(0x66FACC15), blurRadius: 8, offset: Offset(0, 2)),
+                                    Shadow(color: Color(0x4DF97316), blurRadius: 14, offset: Offset(0, 4)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಲಕ್ಷ್ಮೀ ಮಂತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFFFFBF0), Color(0xFFFED7AA), Color(0xFFFACC15)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFFFDE68A), width: 1.3),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x66FACC15), blurRadius: 32, spreadRadius: 8, offset: Offset(0, 18)),
+                    BoxShadow(color: Color(0x33FB923C), blurRadius: 20, offset: Offset(0, 10)),
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: <Color>[const Color(0xFFFFF4CE).withValues(alpha: 0.85), Colors.transparent],
+                            radius: 0.8,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: <Color>[Color(0xFFFACC15), Color(0xFFFB923C)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(color: Color(0x4DFB923C), blurRadius: 18, offset: Offset(0, 8)),
+                              ],
+                            ),
+                            child: Text(
+                              '🌸',
+                              style: GoogleFonts.notoSansKannada(fontSize: 28, fontWeight: FontWeight.w800, color: const Color(0xFF7C2D12), letterSpacing: 3),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            mantra.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: const Color(0xFFB45309)),
+                          ),
+                          const SizedBox(height: 18),
+                          ...mantra.lines.map(
+                            (String line) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSansKannada(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: const Color(0xFF7C2D12),
+                                  shadows: const <Shadow>[
+                                    Shadow(color: Color(0x66FACC15), blurRadius: 8, offset: Offset(0, 2)),
+                                    Shadow(color: Color(0x4DFB923C), blurRadius: 14, offset: Offset(0, 4)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಶಿವ ಮಂತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFF5F3FF), Color(0xFFE0E7FF), Color(0xFF7C3AED)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFFC7D2FE), width: 1.3),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x667C3AED), blurRadius: 32, spreadRadius: 8, offset: Offset(0, 18)),
+                    BoxShadow(color: Color(0x3338BDF8), blurRadius: 20, offset: Offset(0, 10)),
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: <Color>[Colors.white.withValues(alpha: 0.9), Colors.transparent],
+                            radius: 0.82,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: <Color>[Color(0xFF38BDF8), Color(0xFF7C3AED)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(color: Color(0x4D38BDF8), blurRadius: 18, offset: Offset(0, 8)),
+                              ],
+                            ),
+                            child: Text(
+                              '🔱',
+                              style: GoogleFonts.notoSansKannada(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 3),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            mantra.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: const Color(0xFF312E81)),
+                          ),
+                          const SizedBox(height: 18),
+                          ...mantra.lines.map(
+                            (String line) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSansKannada(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: const Color(0xFF1E3A8A),
+                                  shadows: const <Shadow>[
+                                    Shadow(color: Color(0x66FFFFFF), blurRadius: 10, offset: Offset(0, 3)),
+                                    Shadow(color: Color(0x4D38BDF8), blurRadius: 14, offset: Offset(0, 4)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಸರಸ್ವತಿ ಸ್ತೋತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFFFFFFF), Color(0xFFF8FAFC), Color(0xFFE5E7EB)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x33576382), blurRadius: 28, spreadRadius: 6, offset: Offset(0, 16)),
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: <Color>[Colors.white.withValues(alpha: 0.92), Colors.transparent],
+                            radius: 0.78,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: <Color>[Color(0xFFF9FAFB), Color(0xFFD1D5DB)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(color: Color(0x33CBD5F5), blurRadius: 14, offset: Offset(0, 6)),
+                              ],
+                            ),
+                            child: Text(
+                              '🎶',
+                              style: GoogleFonts.notoSansKannada(fontSize: 26, fontWeight: FontWeight.w800, color: const Color(0xFF1E293B), letterSpacing: 3),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            mantra.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: const Color(0xFF1E3A8A)),
+                          ),
+                          const SizedBox(height: 18),
+                          ...mantra.lines.map(
+                            (String line) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSansKannada(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: const Color(0xFF0F172A),
+                                  shadows: const <Shadow>[
+                                    Shadow(color: Color(0x55FFFFFF), blurRadius: 8, offset: Offset(0, 2)),
+                                    Shadow(color: Color(0x332563EB), blurRadius: 12, offset: Offset(0, 4)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ಸಾಯಿಬಾಬಾ ಸ್ತೋತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFF111827), Color(0xFF1F2937), Color(0xFF312E81)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFF4C1D95).withValues(alpha: 0.35), width: 1.2),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x4D312E81), blurRadius: 30, spreadRadius: 8, offset: Offset(0, 18)),
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: <Color>[Colors.white.withValues(alpha: 0.12), Colors.transparent],
+                            radius: 0.75,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: <Color>[Color(0xFFEAB308), Color(0xFFFACC15)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(color: Color(0x33FACC15), blurRadius: 16, offset: Offset(0, 8)),
+                              ],
+                            ),
+                            child: Text(
+                              '🕉️',
+                              style: GoogleFonts.notoSansKannada(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 3),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            mantra.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white.withValues(alpha: 0.9)),
+                          ),
+                          const SizedBox(height: 18),
+                          ...mantra.lines.map(
+                            (String line) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSansKannada(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: Colors.white,
+                                  shadows: const <Shadow>[
+                                    Shadow(color: Color(0x55FFFFFF), blurRadius: 10, offset: Offset(0, 3)),
+                                    Shadow(color: Color(0x33312E81), blurRadius: 16, offset: Offset(0, 5)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+          if (mantra.title == 'ಶ್ರೀ ವಿಷ್ಣು ಸ್ತೋತ್ರ') {
+            return GlassCard(
+              padding: const EdgeInsets.all(24),
+              borderRadius: 30,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: <Color>[Color(0xFFF0F9FF), Color(0xFFE0F2FE), Color(0xFFBAE6FD)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(30),
+                  border: Border.all(color: const Color(0xFFBFDBFE), width: 1.2),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(color: Color(0x4D38BDF8), blurRadius: 28, spreadRadius: 6, offset: Offset(0, 18)),
+                  ],
+                ),
+                child: Stack(
+                  children: <Widget>[
+                    Positioned.fill(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: RadialGradient(
+                            colors: <Color>[Colors.white.withValues(alpha: 0.75), Colors.transparent],
+                            radius: 0.82,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(24),
+                              gradient: const LinearGradient(
+                                colors: <Color>[Color(0xFF38BDF8), Color(0xFF0EA5E9)],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              boxShadow: const <BoxShadow>[
+                                BoxShadow(color: Color(0x3338BDF8), blurRadius: 14, offset: Offset(0, 6)),
+                              ],
+                            ),
+                            child: Text(
+                              '🌀',
+                              style: GoogleFonts.notoSansKannada(fontSize: 26, fontWeight: FontWeight.w800, color: Colors.white, letterSpacing: 3),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            mantra.title,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.notoSansKannada(fontSize: 22, fontWeight: FontWeight.w900, color: const Color(0xFF1D4ED8)),
+                          ),
+                          const SizedBox(height: 18),
+                          ...mantra.lines.map(
+                            (String line) => Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 6),
+                              child: Text(
+                                line,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSansKannada(
+                                  fontSize: 19,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: const Color(0xFF38BDF8),
+                                  shadows: const <Shadow>[
+                                    Shadow(color: Color(0x66FFFFFF), blurRadius: 8, offset: Offset(0, 2)),
+                                    Shadow(color: Color(0x332563EB), blurRadius: 12, offset: Offset(0, 4)),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
           return GlassCard(
             padding: const EdgeInsets.all(20),
             borderRadius: 24,
@@ -94,12 +1258,17 @@ class _MantraTabContent extends StatelessWidget {
   }
 }
 
-class _FestivalsComingSoonContent extends StatelessWidget {
-  const _FestivalsComingSoonContent();
+class _FestivalsContent extends StatelessWidget {
+  const _FestivalsContent({required this.year, required this.onDayTap});
+
+  final int year;
+  final ValueChanged<DateTime> onDayTap;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    final List<_FestivalEntry> entries = _buildFestivalEntries(year);
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -108,35 +1277,100 @@ class _FestivalsComingSoonContent extends StatelessWidget {
           end: Alignment.bottomCenter,
         ),
       ),
-      child: Center(
-        child: GlassCard(
-          borderRadius: 28,
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Icon(Icons.event_available_rounded, size: 56, color: theme.colorScheme.primary),
-              const SizedBox(height: 16),
-              Text(
-                'ಉತ್ಸವಗಳ ವಿಭಾಗ ಶೀಘ್ರದಲ್ಲೇ',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+      child: SafeArea(
+        child: ListView.separated(
+          padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
+          itemCount: entries.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 14),
+          itemBuilder: (BuildContext context, int index) {
+            final _FestivalEntry entry = entries[index];
+            return GestureDetector(
+              onTap: () => onDayTap(entry.date),
+              child: GlassCard(
+                borderRadius: 24,
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          entry.formattedDate,
+                          style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                        ),
+                        Row(
+                          children: <Widget>[
+                            const Icon(Icons.event_rounded, size: 18, color: Color(0xFF1D4ED8)),
+                            const SizedBox(width: 6),
+                            Text(
+                              DateFormat.MMMd('kn_IN').format(entry.date),
+                              style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface.withValues(alpha: 0.65)),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    ...entry.festivals.map(
+                      (String festival) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: <Widget>[
+                            const Icon(Icons.star_rounded, size: 18, color: Color(0xFFF59E0B)),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(
+                                festival,
+                                style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 12),
-              Text(
-                'ಪೂರ್ಣ ಮಾಸದ ಉತ್ಸವ ಮತ್ತು ವಿಶೇಷ ದಿನಗಳ ವಿವರಗಳನ್ನು ಇಲ್ಲಿ ನೋಡಬಹುದು. تازهಪಡಿಸುತ್ತಿದ್ದೇವೆ!',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.notoSansKannada(fontSize: 14.5, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
+
+  static List<_FestivalEntry> _buildFestivalEntries(int year) {
+    final DateTime start = DateTime(year, 1, 1);
+    final DateTime end = DateTime(year, 12, 31);
+    final List<_FestivalEntry> entries = <_FestivalEntry>[];
+    for (DateTime current = start; !current.isAfter(end); current = current.add(const Duration(days: 1))) {
+      final List<String> festivals = PanchangaDataUtils.festivalsFor(current);
+      if (festivals.isEmpty) {
+        continue;
+      }
+      entries.add(
+        _FestivalEntry(
+          date: current,
+          festivals: festivals,
+          formattedDate: DateFormat('EEEE, d MMMM', 'kn_IN').format(current),
+        ),
+      );
+    }
+    return entries;
+  }
+}
+
+class _FestivalEntry {
+  const _FestivalEntry({required this.date, required this.festivals, required this.formattedDate});
+
+  final DateTime date;
+  final List<String> festivals;
+  final String formattedDate;
 }
 
 enum _HomeSection { daily, monthly, mantra, festivals }
+
+enum _DailyNavAction { yesterday, today, tomorrow }
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
@@ -144,6 +1378,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late DateTime _dailyMonth;
   late DateTime _monthlyMonth;
   late PageController _pageController;
+  bool _yesterdayLabelUpdated = false;
+  bool _tomorrowLabelUpdated = false;
+  bool _isDayTransitioning = false;
+  _DailyNavAction? _activeNavAction;
   int _navIndex = 0;
   _HomeSection _section = _HomeSection.daily;
   late Timer _clockTimer;
@@ -170,6 +1408,117 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
   }
 
+  void _openMonthlyPanchanga(BuildContext context, DateTime month) {
+    final ThemeData theme = Theme.of(context);
+    final List<PanchangaDay> days = PanchangaDataUtils.daysForMonth(month);
+    final String title = '${PanchangaDataUtils.kannadaMonthLabel(month)} ${month.year}';
+
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        final double maxHeight = MediaQuery.of(context).size.height * 0.7;
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 12,
+            bottom: MediaQuery.of(context).padding.bottom + 16,
+          ),
+          child: GlassCard(
+            borderRadius: 28,
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Center(
+                  child: Container(
+                    width: 60,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'ಪಂಚಾಂಗ • $title',
+                  style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                ),
+                const SizedBox(height: 16),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxHeight: maxHeight),
+                  child: ListView.separated(
+                    shrinkWrap: true,
+                    itemCount: days.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 12),
+                    itemBuilder: (BuildContext context, int index) {
+                      final PanchangaDay day = days[index];
+                      final List<String> festivals = day.festivals ?? <String>[];
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.18), width: 1.1),
+                          color: theme.colorScheme.surface.withValues(alpha: 0.92),
+                          boxShadow: const <BoxShadow>[
+                            BoxShadow(color: Color(0x110F172A), blurRadius: 10, offset: Offset(0, 6)),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  DateFormat('EEEE, d MMMM', 'kn_IN').format(day.date),
+                                  style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                                ),
+                                Text(
+                                  DateFormat('d MMM').format(day.date),
+                                  style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Text('ತಿಥಿ: ${day.tithi}', style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.85))),
+                            Text('ನಕ್ಷತ್ರ: ${day.nakshatra}', style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.85))),
+                            Text('ಯೋಗ: ${day.yoga}', style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.85))),
+                            Text('ಕರಣ: ${day.karana}', style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.85))),
+                            Text('ಪಕ್ಷ: ${day.paksha}', style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.85))),
+                            if (festivals.isNotEmpty) ...<Widget>[
+                              const SizedBox(height: 8),
+                              Text('ಉತ್ಸವಗಳು', style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w700, color: theme.colorScheme.secondary)),
+                              const SizedBox(height: 4),
+                              ...festivals.map(
+                                (String festival) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 1.5),
+                                  child: Text('• $festival', style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.8))),
+                                ),
+                              ),
+                            ]
+                            else ...<Widget>[
+                              const SizedBox(height: 8),
+                              Text('ಈ ದಿನಕ್ಕೆ ವಿಶೇಷ ಉತ್ಸವಗಳಿಲ್ಲ', style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
+                            ],
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _handleTabChange() {
     if (_tabController.indexIsChanging) {
       return;
@@ -187,15 +1536,69 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   void _loadYesterdayCalendar() {
-    _loadCalendar(_calendarDate.subtract(const Duration(days: 1)));
+    if (_isDayTransitioning) {
+      return;
+    }
+    setState(() {
+      if (!_yesterdayLabelUpdated) {
+        _yesterdayLabelUpdated = true;
+      }
+      _isDayTransitioning = true;
+      _activeNavAction = _DailyNavAction.yesterday;
+    });
+    Future<void>.microtask(() {
+      _loadCalendar(_calendarDate.subtract(const Duration(days: 1)));
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _isDayTransitioning = false;
+        _activeNavAction = null;
+      });
+    });
   }
 
   void _loadTodayCalendar() {
-    _loadCalendar(DateTime.now());
+    if (_isDayTransitioning) {
+      return;
+    }
+    setState(() {
+      _isDayTransitioning = true;
+      _activeNavAction = _DailyNavAction.today;
+    });
+    Future<void>.microtask(() {
+      _loadCalendar(DateUtils.dateOnly(DateTime.now()));
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _isDayTransitioning = false;
+        _activeNavAction = null;
+      });
+    });
   }
 
   void _loadTomorrowCalendar() {
-    _loadCalendar(_calendarDate.add(const Duration(days: 1)));
+    if (_isDayTransitioning) {
+      return;
+    }
+    setState(() {
+      if (!_tomorrowLabelUpdated) {
+        _tomorrowLabelUpdated = true;
+      }
+      _isDayTransitioning = true;
+      _activeNavAction = _DailyNavAction.tomorrow;
+    });
+    Future<void>.microtask(() {
+      _loadCalendar(_calendarDate.add(const Duration(days: 1)));
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _isDayTransitioning = false;
+        _activeNavAction = null;
+      });
+    });
   }
 
   void _goToPreviousMonth() {
@@ -258,11 +1661,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       onTomorrow: _loadTomorrowCalendar,
       onPrevMonth: _goToPreviousMonth,
       onNextMonth: _goToNextMonth,
+      yesterdayLabelUpdated: _yesterdayLabelUpdated,
+      tomorrowLabelUpdated: _tomorrowLabelUpdated,
+      isLoading: _isDayTransitioning,
+      loadingAction: _activeNavAction,
     );
 
-    final Widget monthlyContent = _MonthlyContent(month: _monthlyMonth);
+    final Widget monthlyContent = _MonthlyContent(
+      month: _monthlyMonth,
+      onShowPanchanga: () => _openMonthlyPanchanga(context, _monthlyMonth),
+    );
     final Widget mantraContent = const _MantraTabContent();
-    final Widget festivalsContent = const _FestivalsComingSoonContent();
+    final Widget festivalsContent = _FestivalsContent(
+      year: headerMonth.year,
+      onDayTap: (DateTime date) => _openDaySheet(context, date, state),
+    );
 
     return Scaffold(
       body: Stack(
@@ -610,6 +2023,10 @@ class _DailyContent extends StatelessWidget {
     required this.onTomorrow,
     required this.onPrevMonth,
     required this.onNextMonth,
+    required this.yesterdayLabelUpdated,
+    required this.tomorrowLabelUpdated,
+    required this.isLoading,
+    required this.loadingAction,
   });
 
   final DateTime selectedMonth;
@@ -625,6 +2042,10 @@ class _DailyContent extends StatelessWidget {
   final VoidCallback onTomorrow;
   final VoidCallback onPrevMonth;
   final VoidCallback onNextMonth;
+  final bool yesterdayLabelUpdated;
+  final bool tomorrowLabelUpdated;
+  final bool isLoading;
+  final _DailyNavAction? loadingAction;
 
   @override
   Widget build(BuildContext context) {
@@ -641,11 +2062,32 @@ class _DailyContent extends StatelessWidget {
           const SizedBox(height: 20),
           Row(
             children: <Widget>[
-              Expanded(child: _CalendarNavButton(label: 'ನಿನ್ನೆ', onTap: onYesterday, color: const Color(0xFF166534))),
+              Expanded(
+                child: _CalendarNavButton(
+                  label: yesterdayLabelUpdated ? 'ಹಿಂದೆ' : 'ನಿನ್ನೆ',
+                  onTap: onYesterday,
+                  color: const Color(0xFF166534),
+                  isLoading: isLoading && loadingAction == _DailyNavAction.yesterday,
+                ),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _CalendarNavButton(label: 'ಇಂದು', onTap: onToday, color: const Color(0xFFF97316))),
+              Expanded(
+                child: _CalendarNavButton(
+                  label: 'ಇಂದು',
+                  onTap: onToday,
+                  color: const Color(0xFFF97316),
+                  isLoading: isLoading && loadingAction == _DailyNavAction.today,
+                ),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _CalendarNavButton(label: 'ನಾಳೆ', onTap: onTomorrow, color: const Color(0xFFE11D48))),
+              Expanded(
+                child: _CalendarNavButton(
+                  label: tomorrowLabelUpdated ? 'ಮುಂದೆ' : 'ನಾಳೆ',
+                  onTap: onTomorrow,
+                  color: const Color(0xFFE11D48),
+                  isLoading: isLoading && loadingAction == _DailyNavAction.tomorrow,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 18),
@@ -665,9 +2107,10 @@ class _DailyContent extends StatelessWidget {
 }
 
 class _MonthlyContent extends StatelessWidget {
-  const _MonthlyContent({required this.month});
+  const _MonthlyContent({required this.month, required this.onShowPanchanga});
 
   final DateTime month;
+  final VoidCallback onShowPanchanga;
 
   @override
   Widget build(BuildContext context) {
@@ -705,6 +2148,23 @@ class _MonthlyContent extends StatelessWidget {
             ),
             const SizedBox(height: 24),
           ],
+          Align(
+            alignment: Alignment.centerRight,
+            child: ElevatedButton.icon(
+              onPressed: onShowPanchanga,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0F4AA3),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                textStyle: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                elevation: 4,
+              ),
+              icon: const Icon(Icons.menu_book_rounded, size: 20),
+              label: const Text('ಪಂಚಾಂಗ'),
+            ),
+          ),
+          const SizedBox(height: 20),
           _MonthlyHighlights(month: month),
           const SizedBox(height: 60),
         ],
@@ -804,11 +2264,12 @@ class _CalendarImage extends StatelessWidget {
 }
 
 class _CalendarNavButton extends StatelessWidget {
-  const _CalendarNavButton({required this.label, required this.onTap, required this.color});
+  const _CalendarNavButton({required this.label, required this.onTap, required this.color, this.isLoading = false});
 
   final String label;
   final VoidCallback onTap;
   final Color color;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -822,7 +2283,32 @@ class _CalendarNavButton extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 3,
       ),
-      child: Text(label),
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 180),
+        transitionBuilder: (Widget child, Animation<double> animation) => FadeTransition(opacity: animation, child: child),
+        child: isLoading
+            ? Row(
+                key: const ValueKey<String>('loading'),
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.2,
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(label, style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w700)),
+                ],
+              )
+            : Text(
+                label,
+                key: ValueKey<String>(label),
+              ),
+      ),
     );
   }
 }
