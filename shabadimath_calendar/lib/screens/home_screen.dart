@@ -2,12 +2,15 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../models/panchanga_day.dart';
+import '../models/reminder.dart';
 import '../providers/app_state.dart';
+import '../providers/reminder_provider.dart';
 import '../utils/data_utils.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/gradient_background.dart';
@@ -1267,7 +1270,9 @@ class _FestivalsContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final List<_FestivalEntry> entries = _buildFestivalEntries(year);
+    final ReminderProvider reminderProvider = Provider.of<ReminderProvider>(context);
+    final List<_FestivalEntry> festivalEntries = _buildFestivalEntries(year);
+    final List<Reminder> reminders = reminderProvider.upcomingReminders;
 
     return Container(
       decoration: const BoxDecoration(
@@ -1278,62 +1283,161 @@ class _FestivalsContent extends StatelessWidget {
         ),
       ),
       child: SafeArea(
-        child: ListView.separated(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 32),
-          itemCount: entries.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 14),
-          itemBuilder: (BuildContext context, int index) {
-            final _FestivalEntry entry = entries[index];
-            return GestureDetector(
-              onTap: () => onDayTap(entry.date),
-              child: GlassCard(
-                borderRadius: 24,
-                padding: const EdgeInsets.all(20),
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+              sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          entry.formattedDate,
-                          style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
-                        ),
-                        Row(
-                          children: <Widget>[
-                            const Icon(Icons.event_rounded, size: 18, color: Color(0xFF1D4ED8)),
-                            const SizedBox(width: 6),
-                            Text(
-                              DateFormat.MMMd('kn_IN').format(entry.date),
-                              style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface.withValues(alpha: 0.65)),
-                            ),
-                          ],
-                        ),
-                      ],
+                    Text(
+                      'ಉತ್ಸವಗಳ ಸೂಚಿ',
+                      style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
                     ),
                     const SizedBox(height: 12),
-                    ...entry.festivals.map(
-                      (String festival) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
-                          children: <Widget>[
-                            const Icon(Icons.star_rounded, size: 18, color: Color(0xFFF59E0B)),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                festival,
-                                style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700),
+                  ],
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (BuildContext context, int index) {
+                    final _FestivalEntry entry = festivalEntries[index];
+                    final bool isLast = index == festivalEntries.length - 1;
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
+                      child: GestureDetector(
+                        onTap: () => onDayTap(entry.date),
+                        child: GlassCard(
+                          borderRadius: 24,
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    entry.formattedDate,
+                                    style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                                  ),
+                                  Row(
+                                    children: <Widget>[
+                                      const Icon(Icons.event_available_rounded, size: 18, color: Color(0xFF1D4ED8)),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        DateFormat.MMMd('kn_IN').format(entry.date),
+                                        style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface.withValues(alpha: 0.65)),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 12),
+                              ...entry.festivals.map(
+                                (String festival) => Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  child: Row(
+                                    children: <Widget>[
+                                      const Icon(Icons.star_rounded, size: 18, color: Color(0xFFF59E0B)),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          festival,
+                                          style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
+                    );
+                  },
+                  childCount: festivalEntries.length,
+                ),
+              ),
+            ),
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 28, 16, 12),
+              sliver: SliverToBoxAdapter(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      'ಸ್ಮರಣಿಕೆಗಳು',
+                      style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.secondary),
+                    ),
+                    ElevatedButton.icon(
+                      onPressed: () => _openReminderSheet(context, reminderProvider),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF0F4AA3),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                        textStyle: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
+                      icon: const Icon(Icons.add_rounded, size: 18),
+                      label: const Text('ಹೊಸ ರಿಮೈಂಡರ್'),
                     ),
                   ],
                 ),
               ),
-            );
-          },
+            ),
+            if (reminders.isEmpty)
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverToBoxAdapter(
+                  child: GlassCard(
+                    borderRadius: 24,
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        const Icon(Icons.alarm_on_rounded, size: 48, color: Color(0xFF1D4ED8)),
+                        const SizedBox(height: 12),
+                        Text(
+                          'ರವಿಭಕ್ತಿ ಸ್ಮರಣಿಕೆ ಇಲ್ಲ',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.notoSansKannada(fontSize: 16, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface.withValues(alpha: 0.8)),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'ಉತ್ಸವ ಅಥವಾ ವೈಯಕ್ತಿಕ ದಿನಗಳನ್ನು ಇಲ್ಲಿ ಸೇರಿಸಿ ಮತ್ತು ಸಮಯಕ್ಕೆ ಸೂಚನೆ ಪಡೆಯಿರಿ.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.notoSansKannada(fontSize: 13.5, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            else
+              SliverPadding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                sliver: SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
+                      final Reminder reminder = reminders[index];
+                      final bool isLast = index == reminders.length - 1;
+                      return Padding(
+                        padding: EdgeInsets.only(bottom: isLast ? 0 : 12),
+                        child: _ReminderCard(reminder: reminder, provider: reminderProvider),
+                      );
+                    },
+                    childCount: reminders.length,
+                  ),
+                ),
+              ),
+            const SliverPadding(padding: EdgeInsets.only(bottom: 32)),
+          ],
         ),
       ),
     );
@@ -1358,6 +1462,172 @@ class _FestivalsContent extends StatelessWidget {
     }
     return entries;
   }
+
+  static Future<void> _openReminderSheet(BuildContext context, ReminderProvider provider, {Reminder? editing}) async {
+    final ThemeData theme = Theme.of(context);
+    final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+    String title = editing?.title ?? '';
+    DateTime date = editing?.date ?? DateTime.now();
+    TimeOfDay? time = editing?.timeOfDay;
+    ReminderRepeat repeat = editing?.repeat ?? ReminderRepeat.none;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 16,
+                right: 16,
+                top: 16,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: GlassCard(
+                borderRadius: 28,
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Center(
+                        child: Container(
+                          width: 60,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 18),
+                      Text(
+                        editing == null ? 'ಹೊಸ ಸ್ಮರಣಿಕೆ' : 'ಸ್ಮರಣಿಕೆ ಸಂಪಾದನೆ',
+                        style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        initialValue: title,
+                        decoration: const InputDecoration(
+                          labelText: 'ಗಮನಿಸುವ ದಿನದ ಹೆಸರು',
+                        ),
+                        style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w600),
+                        validator: (String? value) => value == null || value.trim().isEmpty ? 'ಶೀರ್ಷಿಕೆ ಅಗತ್ಯ' : null,
+                        onSaved: (String? value) => title = value!.trim(),
+                      ),
+                      const SizedBox(height: 16),
+                      _DateSelector(
+                        date: date,
+                        onTap: () async {
+                          final DateTime? picked = await showDatePicker(
+                            context: context,
+                            initialDate: date,
+                            firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                            lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+                            locale: const Locale('kn', 'IN'),
+                          );
+                          if (picked != null) {
+                            setModalState(() {
+                              date = picked;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      _TimeSelector(
+                        time: time,
+                        onPick: () async {
+                          final TimeOfDay initial = time ?? TimeOfDay(hour: 8, minute: 0);
+                          final TimeOfDay? picked = await showTimePicker(
+                            context: context,
+                            initialTime: initial,
+                            builder: (BuildContext context, Widget? child) {
+                              return MediaQuery(
+                                data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+                                child: child ?? const SizedBox.shrink(),
+                              );
+                            },
+                          );
+                          setModalState(() {
+                            time = picked;
+                          });
+                        },
+                        onClear: () => setModalState(() {
+                          time = null;
+                        }),
+                      ),
+                      const SizedBox(height: 16),
+                      _RepeatSelector(
+                        repeat: repeat,
+                        onChanged: (ReminderRepeat value) {
+                          setModalState(() {
+                            repeat = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (formKey.currentState?.validate() ?? false) {
+                                  formKey.currentState?.save();
+                                  Navigator.of(context).pop(<dynamic>[title, date, time, repeat]);
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF166534),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                textStyle: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                              ),
+                              child: Text(editing == null ? 'ಸೇರಿಸಿ' : 'ನವೀಕರಿಸಿ'),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.4)),
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                textStyle: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                              ),
+                              child: const Text('ರದ್ದು'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    ).then((dynamic result) async {
+      if (result is List<dynamic> && result.length == 4) {
+        final String newTitle = result[0] as String;
+        final DateTime newDate = result[1] as DateTime;
+        final TimeOfDay? newTime = result[2] as TimeOfDay?;
+        final ReminderRepeat newRepeat = result[3] as ReminderRepeat;
+        if (editing == null) {
+          await provider.addReminder(title: newTitle, date: newDate, time: newTime, repeat: newRepeat);
+        } else {
+          await provider.updateReminder(editing, title: newTitle, date: newDate, time: newTime, repeat: newRepeat);
+        }
+      }
+    });
+  }
+
 }
 
 class _FestivalEntry {
@@ -1368,11 +1638,267 @@ class _FestivalEntry {
   final String formattedDate;
 }
 
+class _ReminderCard extends StatelessWidget {
+  const _ReminderCard({required this.reminder, required this.provider});
+
+  final Reminder reminder;
+  final ReminderProvider provider;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final DateFormat dateFormatter = DateFormat('d MMMM yyyy, EEEE', 'kn_IN');
+    final TimeOfDay? time = reminder.timeOfDay;
+    final String timeLabel = time == null
+        ? 'ಸಮಯ ನಿರ್ಧರಿಸಲಾಗಿಲ್ಲ'
+        : DateFormat('hh:mm a').format(DateTime(0).add(Duration(hours: time.hour, minutes: time.minute)));
+    final String repeatLabel = _repeatLabel(reminder.repeat);
+
+    return GlassCard(
+      borderRadius: 22,
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Container(
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: LinearGradient(
+                    colors: <Color>[Color(0xFFFBCFE8), Color(0xFFF472B6)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: const Icon(Icons.alarm_rounded, color: Color(0xFF831843)),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      reminder.title,
+                      style: GoogleFonts.notoSansKannada(fontSize: 16.5, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      dateFormatter.format(reminder.date),
+                      style: GoogleFonts.notoSansKannada(fontSize: 13.5, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                    ),
+                  ],
+                ),
+              ),
+              IconButton(
+                tooltip: 'ತಿದ್ದು',
+                onPressed: () => _FestivalsContent._openReminderSheet(context, provider, editing: reminder),
+                icon: const Icon(Icons.edit_rounded, color: Color(0xFF0F4AA3)),
+              ),
+              IconButton(
+                tooltip: 'ಅಳಿಸಿ',
+                onPressed: () => _confirmDelete(context),
+                icon: const Icon(Icons.delete_rounded, color: Color(0xFFB91C1C)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: <Widget>[
+              const Icon(Icons.schedule_rounded, size: 18, color: Color(0xFF1E3A8A)),
+              const SizedBox(width: 8),
+              Text(
+                timeLabel,
+                style: GoogleFonts.notoSansKannada(fontSize: 13.5, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: <Widget>[
+              const Icon(Icons.repeat_rounded, size: 18, color: Color(0xFF831843)),
+              const SizedBox(width: 8),
+              Text(
+                repeatLabel,
+                style: GoogleFonts.notoSansKannada(fontSize: 13.5, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text('ಸ್ಮರಣಿಕೆ ಅಳಿಸಬೇಕೇ?', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w800)),
+        content: Text('"${reminder.title}" ಸ್ಮರಣಿಕೆಯನ್ನು ಅಳಿಸುವಿರಾ?', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w600)),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('ರದ್ದು', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w700)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('ಅಳಿಸಿ', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w700, color: const Color(0xFFB91C1C))),
+          ),
+        ],
+      ),
+    );
+    if (confirmed ?? false) {
+      await provider.deleteReminder(reminder);
+    }
+  }
+
+  String _repeatLabel(ReminderRepeat repeat) {
+    switch (repeat) {
+      case ReminderRepeat.none:
+        return 'ಎಲ್ಲಾ ಬಾರಿ ಮಾತ್ರ';
+      case ReminderRepeat.daily:
+        return 'ಪ್ರತಿ ದಿನ';
+      case ReminderRepeat.weekly:
+        return 'ವಾರಕ್ಕೊಮ್ಮೆ';
+      case ReminderRepeat.yearly:
+        return 'ಪ್ರತಿ ವರ್ಷ';
+    }
+  }
+}
+
+class _DateSelector extends StatelessWidget {
+  const _DateSelector({required this.date, required this.onTap});
+
+  final DateTime date;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final DateFormat formatter = DateFormat('d MMMM yyyy, EEEE', 'kn_IN');
+    return InkWell(
+      borderRadius: BorderRadius.circular(18),
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primary.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: <Widget>[
+            const Icon(Icons.calendar_today_rounded, size: 18, color: Color(0xFF1D4ED8)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                formatter.format(date),
+                style: GoogleFonts.notoSansKannada(fontSize: 14.5, fontWeight: FontWeight.w700),
+              ),
+            ),
+            Text(
+              'ಬದಲಿಸಿ',
+              style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w700, color: theme.colorScheme.primary),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TimeSelector extends StatelessWidget {
+  const _TimeSelector({required this.time, required this.onPick, required this.onClear});
+
+  final TimeOfDay? time;
+  final Future<void> Function() onPick;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final String label = time == null
+        ? 'ಸಮಯವನ್ನು ಸೇರಿಸಿ (ಐಚ್ಛಿಕ)'
+        : '${time!.hour.toString().padLeft(2, '0')}:${time!.minute.toString().padLeft(2, '0')}';
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: ElevatedButton.icon(
+            onPressed: onPick,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF0F4AA3),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              textStyle: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            ),
+            icon: const Icon(Icons.access_time_rounded, size: 18),
+            label: Text(label),
+          ),
+        ),
+        const SizedBox(width: 12),
+        if (time != null)
+          OutlinedButton(
+            onPressed: onClear,
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.4)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              textStyle: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w700),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            ),
+            child: const Text('ತೆಗೆದುಹಾಕಿ'),
+          ),
+      ],
+    );
+  }
+}
+
+class _RepeatSelector extends StatelessWidget {
+  const _RepeatSelector({required this.repeat, required this.onChanged});
+
+  final ReminderRepeat repeat;
+  final ValueChanged<ReminderRepeat> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final Map<ReminderRepeat, String> labels = <ReminderRepeat, String>{
+      ReminderRepeat.none: 'ಒಮ್ಮೆ',
+      ReminderRepeat.daily: 'ಪ್ರತಿ ದಿನ',
+      ReminderRepeat.weekly: 'ವಾರದಂತೆ',
+      ReminderRepeat.yearly: 'ವಾರ್ಷಿಕ',
+    };
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: labels.entries.map(
+        (MapEntry<ReminderRepeat, String> entry) {
+          final bool selected = repeat == entry.key;
+          return ChoiceChip(
+            label: Text(entry.value, style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w700)),
+            selected: selected,
+            onSelected: (_) => onChanged(entry.key),
+            selectedColor: const Color(0xFFF472B6),
+            backgroundColor: const Color(0xFFFCE7F3),
+            labelStyle: GoogleFonts.notoSansKannada(
+              fontWeight: FontWeight.w700,
+              color: selected ? Colors.white : const Color(0xFF831843),
+            ),
+          );
+        },
+      ).toList(),
+    );
+  }
+}
+
 enum _HomeSection { daily, monthly, mantra, festivals }
 
 enum _DailyNavAction { yesterday, today, tomorrow }
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+  static const MethodChannel _panchangaChannel = MethodChannel('com.dailycalendar.kannada/panchanga');
+
   late TabController _tabController;
   late List<DateTime> _months;
   late DateTime _dailyMonth;
@@ -1406,6 +1932,42 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         _headerDateTime = DateTime.now();
       });
     });
+  }
+
+  void _handleTabChange() {
+    if (_tabController.indexIsChanging) {
+      return;
+    }
+    setState(() {
+      _monthlyMonth = _months[_tabController.index];
+    });
+  }
+
+  void _loadCalendar(DateTime date) {
+    setState(() {
+      _calendarDate = DateUtils.dateOnly(date);
+      _dailyMonth = DateTime(_calendarDate.year, _calendarDate.month, 1);
+      _section = _HomeSection.daily;
+      _navIndex = _section.index;
+      _pageController.jumpToPage(_section.index);
+    });
+  }
+
+  Future<void> _launchNativePanchanga() async {
+    final DateTime month = _monthlyMonth;
+    try {
+      await _panchangaChannel.invokeMethod<void>('showPanchanga', <String, int>{
+        'month': month.month,
+        'year': month.year,
+      });
+    } on PlatformException catch (error) {
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('ಪಂಚಾಂಗ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ: ${error.message ?? 'ಅಜ್ಞಾತ ದೋಷ'}')),
+      );
+    }
   }
 
   void _openMonthlyPanchanga(BuildContext context, DateTime month) {
@@ -1458,53 +2020,125 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     itemBuilder: (BuildContext context, int index) {
                       final PanchangaDay day = days[index];
                       final List<String> festivals = day.festivals ?? <String>[];
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.18), width: 1.1),
-                          color: theme.colorScheme.surface.withValues(alpha: 0.92),
-                          boxShadow: const <BoxShadow>[
-                            BoxShadow(color: Color(0x110F172A), blurRadius: 10, offset: Offset(0, 6)),
-                          ],
-                        ),
+                      return GlassCard(
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+                        borderRadius: 26,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Text(
-                                  DateFormat('EEEE, d MMMM', 'kn_IN').format(day.date),
-                                  style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
-                                ),
-                                Text(
-                                  DateFormat('d MMM').format(day.date),
-                                  style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-                                ),
-                              ],
+                            LayoutBuilder(
+                              builder: (BuildContext context, BoxConstraints constraints) {
+                                final bool hasFestivals = festivals.isNotEmpty;
+                                return ConstrainedBox(
+                                  constraints: BoxConstraints(maxWidth: constraints.maxWidth),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                        padding: const EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                                          borderRadius: BorderRadius.circular(14),
+                                        ),
+                                        child: Icon(Icons.event, color: theme.colorScheme.primary),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Text(
+                                              DateFormat('EEEE, d MMMM', 'kn_IN').format(day.date),
+                                              style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w800),
+                                            ),
+                                            Text(
+                                              DateFormat('d MMM yyyy').format(day.date),
+                                              style: GoogleFonts.notoSansKannada(fontSize: 12.5, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.65)),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      if (hasFestivals)
+                                        Flexible(
+                                          child: Align(
+                                            alignment: Alignment.topRight,
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                              decoration: BoxDecoration(
+                                                color: theme.colorScheme.secondary.withValues(alpha: 0.12),
+                                                borderRadius: BorderRadius.circular(14),
+                                              ),
+                                              child: Text(
+                                                '${festivals.length}+ ಉತ್ಸವಗಳು',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.notoSansKannada(fontSize: 12.5, fontWeight: FontWeight.w700, color: theme.colorScheme.secondary),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
-                            const SizedBox(height: 10),
-                            Text('ತಿಥಿ: ${day.tithi}', style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.85))),
-                            Text('ನಕ್ಷತ್ರ: ${day.nakshatra}', style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.85))),
-                            Text('ಯೋಗ: ${day.yoga}', style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.85))),
-                            Text('ಕರಣ: ${day.karana}', style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.85))),
-                            Text('ಪಕ್ಷ: ${day.paksha}', style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.85))),
-                            if (festivals.isNotEmpty) ...<Widget>[
-                              const SizedBox(height: 8),
-                              Text('ಉತ್ಸವಗಳು', style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w700, color: theme.colorScheme.secondary)),
-                              const SizedBox(height: 4),
-                              ...festivals.map(
-                                (String festival) => Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 1.5),
-                                  child: Text('• $festival', style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.8))),
+                            const SizedBox(height: 14),
+                            Text(
+                              'ತಿಥಿ: ${day.tithi}',
+                              style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.82)),
+                            ),
+                            Text(
+                              'ನಕ್ಷತ್ರ: ${day.nakshatra}',
+                              style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.82)),
+                            ),
+                            Text(
+                              'ಯೋಗ: ${day.yoga}',
+                              style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.82)),
+                            ),
+                            Text(
+                              'ಪಕ್ಷ: ${day.paksha}',
+                              style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.82)),
+                            ),
+                            const SizedBox(height: 12),
+                            if (festivals.isNotEmpty)
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: festivals
+                                    .map(
+                                      (String fest) => Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: <Color>[
+                                              theme.colorScheme.primary.withValues(alpha: 0.12),
+                                              theme.colorScheme.surfaceVariant.withValues(alpha: 0.05),
+                                            ],
+                                          ),
+                                          borderRadius: BorderRadius.circular(14),
+                                          border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.25), width: 1),
+                                        ),
+                                        child: Text(
+                                          fest,
+                                          style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.primary),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              )
+                            else
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: theme.colorScheme.surfaceVariant.withValues(alpha: 0.26),
+                                ),
+                                child: Text(
+                                  'ಈ ದಿನಕ್ಕೆ ವಿಶೇಷ ಉತ್ಸವಗಳಿಲ್ಲ',
+                                  style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                                 ),
                               ),
-                            ]
-                            else ...<Widget>[
-                              const SizedBox(height: 8),
-                              Text('ಈ ದಿನಕ್ಕೆ ವಿಶೇಷ ಉತ್ಸವಗಳಿಲ್ಲ', style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
-                            ],
                           ],
                         ),
                       );
@@ -1517,22 +2151,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         );
       },
     );
-  }
-
-  void _handleTabChange() {
-    if (_tabController.indexIsChanging) {
-      return;
-    }
-    setState(() {
-      _monthlyMonth = _months[_tabController.index];
-    });
-  }
-
-  void _loadCalendar(DateTime date) {
-    setState(() {
-      _calendarDate = DateUtils.dateOnly(date);
-      _dailyMonth = DateTime(_calendarDate.year, _calendarDate.month, 1);
-    });
   }
 
   void _loadYesterdayCalendar() {
@@ -1669,7 +2287,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     final Widget monthlyContent = _MonthlyContent(
       month: _monthlyMonth,
-      onShowPanchanga: () => _openMonthlyPanchanga(context, _monthlyMonth),
+      onShowPanchanga: _launchNativePanchanga,
     );
     final Widget mantraContent = const _MantraTabContent();
     final Widget festivalsContent = _FestivalsContent(
