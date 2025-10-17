@@ -4493,9 +4493,9 @@ class _CalendarCell extends StatelessWidget {
         : const Color(0xFFE2E8F0);
 
     if (highlightPalette != null && isCurrentMonth) {
-      background = highlightPalette.accent.withValues(alpha: 0.18);
-      borderColor = highlightPalette.accent.withValues(alpha: 0.85);
-      baseAccent = highlightPalette.accent;
+      background = highlightPalette.accent;
+      borderColor = highlightPalette.accent.withValues(alpha: 0.95);
+      baseAccent = Colors.white;
     }
 
     return AnimatedOpacity(

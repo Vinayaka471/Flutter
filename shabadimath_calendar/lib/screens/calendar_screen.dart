@@ -176,13 +176,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: highlight != null
-                ? highlight.accent.withOpacity(isSelected ? 0.28 : 0.18)
+                ? highlight.accent
                 : (isSelected
-                    ? theme.colorScheme.primary.withOpacity(0.1)
+                    ? theme.colorScheme.primary.withOpacity(0.18)
                     : Colors.transparent),
             border: Border.all(
               color: highlight != null
-                  ? highlight.accent.withOpacity(isSelected ? 0.95 : 0.75)
+                  ? highlight.accent.withOpacity(0.95)
                   : (isToday && !isSelected
                       ? theme.colorScheme.primary.withOpacity(0.45)
                       : Colors.transparent),
@@ -196,7 +196,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 child: Text(
                   '${day.day}',
                   style: TextStyle(
-                    color: hasAnnotation ? highlight!.accent : textColor,
+                    color: hasAnnotation ? Colors.white : textColor,
                     fontWeight: (isSelected || isToday || hasAnnotation) ? FontWeight.w700 : FontWeight.w500,
                   ),
                 ),
@@ -209,7 +209,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     width: 7,
                     height: 7,
                     decoration: BoxDecoration(
-                      color: highlight!.accent,
+                      color: highlight!.background,
                       shape: BoxShape.circle,
                     ),
                   ),
