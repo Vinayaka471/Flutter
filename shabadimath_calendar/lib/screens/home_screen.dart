@@ -570,10 +570,11 @@ const Map<String, _NoteHighlightPalette> _noteHighlightPalettes = <String, _Note
     background: Color(0xFF4A0D2C), // deep wine pink background
     accent: Color(0xFFAD1457),     // strong magenta accent
   ),
-  'bronze': _NoteHighlightPalette(
-    background: Color(0xFF3E2723), // deep bronze brown
-    accent: Color(0xFF8D6E63),     // metallic bronze accent
-  ),
+ 'skyblue': _NoteHighlightPalette(
+  background: Color(0xFF001F33), // deep navy-teal background (very dark sky blue)
+  accent: Color(0xFF0288D1),     // vibrant sky blue accent
+),
+
   'yellow': _NoteHighlightPalette(
     background: Color(0xFF3A3000), // dark golden brown background
     accent: Color(0xFFFFD600),     // vivid golden accent
