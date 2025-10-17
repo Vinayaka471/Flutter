@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
+import '../models/day_annotation.dart';
 import '../models/panchanga_day.dart';
 import '../models/reminder.dart';
 import '../providers/app_state.dart';
@@ -15,12 +17,1005 @@ import '../utils/data_utils.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/gradient_background.dart';
 import 'mantra_screen.dart';
+import 'panchanga_image_screen.dart';
+import 'rashi_bhavishya_screen.dart';
+import '../services/ad_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _MonthlySlidePageRoute<T> extends PageRouteBuilder<T> {
+  _MonthlySlidePageRoute({required WidgetBuilder builder})
+      : super(
+          transitionDuration: const Duration(milliseconds: 320),
+          reverseTransitionDuration: const Duration(milliseconds: 260),
+          pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) => builder(context),
+          transitionsBuilder: (BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation, Widget child) {
+            final Animation<Offset> slideAnimation = Tween<Offset>(
+              begin: const Offset(0.1, 0),
+              end: Offset.zero,
+            ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic));
+            final Animation<double> fadeAnimation = CurvedAnimation(parent: animation, curve: Curves.easeOutQuad, reverseCurve: Curves.easeInQuad);
+            return SlideTransition(
+              position: slideAnimation,
+              child: FadeTransition(
+                opacity: fadeAnimation,
+                child: child,
+              ),
+            );
+          },
+        );
+}
+
+class _MonthlyActionButton extends StatelessWidget {
+  const _MonthlyActionButton({
+    required this.label,
+    required this.icon,
+    required this.onPressed,
+    required this.theme,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback onPressed;
+  final ThemeData theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        textStyle: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w800),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        elevation: 5,
+        shadowColor: theme.colorScheme.primary.withValues(alpha: 0.45),
+      ),
+      icon: Icon(icon, size: 20),
+      label: Text(label),
+    );
+  }
+}
+
+class _DayAnnotationSheet extends StatefulWidget {
+  const _DayAnnotationSheet({
+    required this.formattedDateLabel,
+    required this.details,
+    required this.events,
+    required this.existingAnnotation,
+    required this.shabadTitle,
+    required this.shabadGurmukhi,
+  });
+
+  final String formattedDateLabel;
+  final PanchangaDay? details;
+  final List<String> events;
+  final DayAnnotation? existingAnnotation;
+  final String shabadTitle;
+  final String shabadGurmukhi;
+
+  @override
+  State<_DayAnnotationSheet> createState() => _DayAnnotationSheetState();
+}
+
+class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
+  late final TextEditingController _noteController;
+  String? _selectedColorKey;
+  late Set<String> _selectedEmojis;
+
+  @override
+  void initState() {
+    super.initState();
+    _noteController = TextEditingController(text: widget.existingAnnotation?.note ?? '');
+    _selectedColorKey = widget.existingAnnotation?.colorKey;
+    _selectedEmojis = <String>{...widget.existingAnnotation?.emojis ?? <String>[]};
+  }
+
+  @override
+  void dispose() {
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final _NoteHighlightPalette? selectedPalette =
+        _selectedColorKey != null ? _noteHighlightPalettes[_selectedColorKey] : null;
+    final DayAnnotation? savedAnnotation = widget.existingAnnotation;
+    final bool hasSavedAnnotation = savedAnnotation != null && savedAnnotation.hasContent;
+    final String savedNote = savedAnnotation?.note ?? '';
+    final String? savedColorKey = savedAnnotation?.colorKey;
+    final _NoteHighlightPalette? savedPalette = savedColorKey != null ? _noteHighlightPalettes[savedColorKey] : null;
+    final List<String> savedEmojis = savedAnnotation?.emojis ?? <String>[];
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 12,
+        bottom: MediaQuery.of(context).viewInsets.bottom + 12,
+      ),
+      child: GlassCard(
+        borderRadius: 28,
+        padding: const EdgeInsets.all(24),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Center(
+                child: Container(
+                  width: 64,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              if (hasSavedAnnotation)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: savedPalette != null
+                        ? savedPalette.accent.withValues(alpha: 0.18)
+                        : theme.colorScheme.surfaceVariant.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: (savedPalette?.accent ?? theme.colorScheme.primary).withValues(alpha: 0.45),
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'ಸಂಗ್ರಹಿತ ವಿವರಗಳು',
+                        style: GoogleFonts.notoSansKannada(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: (savedPalette?.accent ?? theme.colorScheme.primary).withValues(alpha: 0.9),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'ಟಿಪ್ಪಣಿ',
+                            style: GoogleFonts.notoSansKannada(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              savedNote.isNotEmpty ? savedNote : '—',
+                              style: GoogleFonts.notoSansKannada(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: <Widget>[
+                          Text(
+                            'ಬಣ್ಣ',
+                            style: GoogleFonts.notoSansKannada(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            width: 36,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: savedPalette?.accent.withValues(alpha: 0.16) ?? theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: (savedPalette?.accent ?? theme.colorScheme.primary).withValues(alpha: 0.7),
+                                width: 1.2,
+                              ),
+                            ),
+                            child: savedPalette != null
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(9),
+                                      gradient: LinearGradient(
+                                        colors: <Color>[
+                                          savedPalette.accent.withValues(alpha: 0.92),
+                                          savedPalette.accent,
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                    ),
+                                  )
+                                : Center(
+                                    child: Text(
+                                      '—',
+                                      style: GoogleFonts.notoSansKannada(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w700,
+                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                      ),
+                                    ),
+                                  ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'ಇಮೋಜಿ',
+                            style: GoogleFonts.notoSansKannada(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              savedEmojis.isNotEmpty ? savedEmojis.join(' ') : '—',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              if (hasSavedAnnotation) const SizedBox(height: 18),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                      widget.formattedDateLabel,
+                      style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  if (selectedPalette != null)
+                    Container(
+                      width: 48,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: selectedPalette.accent.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: selectedPalette.accent.withValues(alpha: 0.75), width: 1.2),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(11),
+                          gradient: LinearGradient(
+                            colors: <Color>[
+                              selectedPalette.accent.withValues(alpha: 0.9),
+                              selectedPalette.accent,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              _HomeScreenState._detailRow(theme, 'ತಿಥಿ', widget.details?.tithi ?? '—'),
+              _HomeScreenState._detailRow(theme, 'ಪಕ್ಷ', widget.details?.paksha ?? '—'),
+              _HomeScreenState._detailRow(theme, 'ನಕ್ಷತ್ರ', widget.details?.nakshatra ?? '—'),
+              _HomeScreenState._detailRow(theme, 'ಯೋಗ', widget.details?.yoga ?? '—'),
+              _HomeScreenState._detailRow(theme, 'ಕರಣ', widget.details?.karana ?? '—'),
+              if (widget.events.isNotEmpty) ...<Widget>[
+                const SizedBox(height: 18),
+                Text(
+                  'ಉತ್ಸವಗಳು',
+                  style: GoogleFonts.notoSansKannada(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.secondary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...widget.events.map(
+                  (String festival) => Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: Text('• $festival', style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ],
+              const SizedBox(height: 20),
+              Text('ದಿನದ ಶಬ್ದ', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 6),
+              Text(widget.shabadTitle, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+              const SizedBox(height: 6),
+              Text(widget.shabadGurmukhi, style: theme.textTheme.bodyMedium?.copyWith(height: 1.4)),
+              const SizedBox(height: 22),
+              Text(
+                'ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ',
+                style: GoogleFonts.notoSansKannada(fontSize: 16, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: _noteController,
+                maxLines: 3,
+                textInputAction: TextInputAction.newline,
+                decoration: InputDecoration(
+                  hintText: 'ನಿಮ್ಮ ಟಿಪ್ಪಣಿಯನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ...',
+                  hintStyle: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w500),
+                  filled: true,
+                  fillColor: theme.colorScheme.surfaceVariant.withValues(alpha: 0.6),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.15))),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.4)),
+                ),
+                style: GoogleFonts.notoSansKannada(fontSize: 14.5, fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                'ಬಣ್ಣದಿಂದ ಹೈಲೈಟ್ ಮಾಡಿ',
+                style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: _noteHighlightPalettes.entries.map((MapEntry<String, _NoteHighlightPalette> entry) {
+                  final bool isSelected = entry.key == _selectedColorKey;
+                  final List<Color> gradientColors = isSelected
+                      ? <Color>[entry.value.accent.withValues(alpha: 0.92), entry.value.accent]
+                      : <Color>[entry.value.background, entry.value.accent.withValues(alpha: 0.75)];
+                  return ChoiceChip(
+                    label: Container(
+                      width: 36,
+                      height: 18,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(9),
+                        gradient: LinearGradient(
+                          colors: gradientColors,
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                      ),
+                    ),
+                    selected: isSelected,
+                    onSelected: (bool value) {
+                      setState(() {
+                        _selectedColorKey = value ? entry.key : null;
+                      });
+                    },
+                    selectedColor: entry.value.accent.withValues(alpha: 0.22),
+                    backgroundColor: entry.value.background.withValues(alpha: 0.3),
+                    side: BorderSide(color: entry.value.accent.withValues(alpha: isSelected ? 0.9 : 0.4), width: isSelected ? 1.6 : 1),
+                    labelStyle: GoogleFonts.notoSansKannada(color: entry.value.accent, fontWeight: FontWeight.w800),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 18),
+              Text(
+                'ಇಮೋಜಿ ಆಯ್ಕೆಮಾಡಿ',
+                style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: _annotationEmojis.map((String emoji) {
+                  final bool isSelected = _selectedEmojis.contains(emoji);
+                  return FilterChip(
+                    label: Text(emoji, style: const TextStyle(fontSize: 18)),
+                    selected: isSelected,
+                    onSelected: (bool value) {
+                      setState(() {
+                        if (value) {
+                          _selectedEmojis.add(emoji);
+                        } else {
+                          _selectedEmojis.remove(emoji);
+                        }
+                      });
+                    },
+                    selectedColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+                    showCheckmark: false,
+                    backgroundColor: theme.colorScheme.surfaceVariant.withValues(alpha: 0.45),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 26),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pop(_AnnotationResult.clear());
+                      },
+                      icon: const Icon(Icons.delete_outline_rounded),
+                      label: Text('ಅಳಿಸಿ', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w700)),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                        side: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.6), width: 1.2),
+                        foregroundColor: theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: () {
+                        final DayAnnotation annotation = DayAnnotation(
+                          note: _noteController.text,
+                          colorKey: _selectedColorKey,
+                          emojis: _selectedEmojis.toList(),
+                        );
+                        Navigator.of(context).pop(_AnnotationResult.save(annotation));
+                      },
+                      icon: const Icon(Icons.save_rounded),
+                      label: Text('ಸಂಗ್ರಹಿಸಿ', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w800)),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FestivalStaticEntry {
+  _FestivalStaticEntry({required this.name, required this.date});
+
+  final String name;
+  final DateTime date;
+}
+
+final Map<int, List<_FestivalStaticEntry>> _curatedMonthlyFestivals2026 = <int, List<_FestivalStaticEntry>>{
+  1: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ಹಜ್ರತ್ ಅಲಿ ಹುಬ್ಬು', date: DateTime(2026, 1, 3)),
+    _FestivalStaticEntry(name: 'ಹಬ್ಬ್ ಅಲಿ ಹುಬ್ಬು', date: DateTime(2026, 1, 3)),
+    _FestivalStaticEntry(name: 'ಮಕರ ಸಂಕ್ರಾಂತಿ', date: DateTime(2026, 1, 14)),
+    _FestivalStaticEntry(name: 'ವಸಂತ ಪಂಚಮಿ', date: DateTime(2026, 1, 23)),
+  ],
+  2: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ಹನುಮಾನ್ ಜಯಂತಿ', date: DateTime(2026, 2, 2)),
+    _FestivalStaticEntry(name: 'ಹಬ್ಬ್ ಅಲಿ ಹುಬ್ಬು', date: DateTime(2026, 2, 3)),
+    _FestivalStaticEntry(name: 'ಮಹಾಶಿವರಾತ್ರಿ', date: DateTime(2026, 2, 15)),
+    _FestivalStaticEntry(name: 'ಬಸಂತ ಪಂಚಮಿ', date: DateTime(2026, 2, 23)),
+  ],
+  3: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ಹೋಳಿ', date: DateTime(2026, 3, 4)),
+    _FestivalStaticEntry(name: 'ರಮಜಾನ್ ಆರಂಭ', date: DateTime(2026, 3, 20)),
+    _FestivalStaticEntry(name: 'ರಮಜಾನ್ ಮುಕ್ತಾಯ', date: DateTime(2026, 3, 20)),
+  ],
+  4: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ಬೈಸಾಖಿ', date: DateTime(2026, 4, 14)),
+    _FestivalStaticEntry(name: 'ಅಂಬೇಡ್ಕರ್ ಜಯಂತಿ', date: DateTime(2026, 4, 14)),
+    _FestivalStaticEntry(name: 'ಗುರು ರವೀದಾಸ್ ಜಯಂತಿ', date: DateTime(2026, 4, 14)),
+    _FestivalStaticEntry(name: 'ಬುದ್ಧ ಪೂರ್ಣಿಮಾ', date: DateTime(2026, 4, 14)),
+  ],
+  5: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ಗುರು ರವೀದಾಸ್ ಜಯಂತಿ', date: DateTime(2026, 5, 14)),
+    _FestivalStaticEntry(name: 'ಬುದ್ಧ ಪೂರ್ಣಿಮಾ', date: DateTime(2026, 5, 14)),
+  ],
+  6: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ಜುಲೈ', date: DateTime(2026, 6, 4)),
+  ],
+  7: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ಕ್ರಿಷ್ಣ ಜನ್ಮಾಷ್ಟಮಿ', date: DateTime(2026, 7, 7)),
+    _FestivalStaticEntry(name: 'ಯೋಗಿನಿ ಏಕಾದಶಿ', date: DateTime(2026, 7, 10)),
+    _FestivalStaticEntry(name: 'ಮಾಸಿಕ ಶಿವರಾತ್ರಿ', date: DateTime(2026, 7, 12)),
+    _FestivalStaticEntry(name: 'ಅಶಾಢ ಪೂರ್ಣಿಮಾ', date: DateTime(2026, 7, 12)),
+  ],
+  8: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ನಾಗ ಪಂಚಮಿ', date: DateTime(2026, 8, 17)),
+    _FestivalStaticEntry(name: 'ತೂಲ್ಸಿದಾಸ್ ಜಯಂತಿ', date: DateTime(2026, 8, 19)),
+    _FestivalStaticEntry(name: 'ಊಣಂ', date: DateTime(2026, 8, 26)),
+  ],
+  9: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ವಿಜಯದಶಮಿ', date: DateTime(2026, 9, 26)),
+  ],
+  10: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ದೀಪಾವಳಿ', date: DateTime(2026, 10, 20)),
+  ],
+  11: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ಕ್ರಿಸ್‌ಮಸ್', date: DateTime(2026, 12, 25)),
+  ],
+  12: <_FestivalStaticEntry>[
+    _FestivalStaticEntry(name: 'ಕ್ರಿಸ್‌ಮಸ್', date: DateTime(2026, 12, 25)),
+  ],
+};
+
+class _NoteHighlightPalette {
+  const _NoteHighlightPalette({required this.background, required this.accent});
+
+  final Color background;
+  final Color accent;
+}
+
+class _AnnotationResult {
+  const _AnnotationResult._({this.annotation, required this.shouldClear});
+
+  final DayAnnotation? annotation;
+  final bool shouldClear;
+
+  factory _AnnotationResult.save(DayAnnotation annotation) => _AnnotationResult._(annotation: annotation, shouldClear: false);
+  factory _AnnotationResult.clear() => const _AnnotationResult._(annotation: null, shouldClear: true);
+}
+
+const Map<String, _NoteHighlightPalette> _noteHighlightPalettes = <String, _NoteHighlightPalette>{
+  'pink': _NoteHighlightPalette(
+    background: Color(0xFF4A0D2C), // deep wine pink background
+    accent: Color(0xFFAD1457),     // strong magenta accent
+  ),
+  'bronze': _NoteHighlightPalette(
+    background: Color(0xFF3E2723), // deep bronze brown
+    accent: Color(0xFF8D6E63),     // metallic bronze accent
+  ),
+  'yellow': _NoteHighlightPalette(
+    background: Color(0xFF3A3000), // dark golden brown background
+    accent: Color(0xFFFFD600),     // vivid golden accent
+  ),
+  'orange': _NoteHighlightPalette(
+    background: Color(0xFF4E1F00), // deep burnt orange background
+    accent: Color(0xFFFF6F00),     // bright fire orange accent
+  ),
+  'brown': _NoteHighlightPalette(
+    background: Color(0xFF2B1B12), // espresso brown background
+    accent: Color(0xFF795548),     // warm brown accent
+  ),
+  'purple': _NoteHighlightPalette(
+    background: Color(0xFF1A0033), // deep royal violet background
+    accent: Color(0xFF7B1FA2),     // vibrant purple accent
+  ),
+};
+
+
+const List<String> _annotationEmojis = <String>[
+  '🛕',
+  '🚗',
+  '🚌',
+  '❌',
+  '✅',
+  '🔴',
+  '➕',
+  '🐄',
+  '😀',
+  '🚩',
+  '🎂',
+  '⭐',
+  '📍',
+  '💍',
+  '🎉',
+  '🍽️',
+  '💼',
+];
+
+class _MonthlyFestivalsSection extends StatelessWidget {
+  const _MonthlyFestivalsSection({required this.month, required this.days});
+
+  final DateTime month;
+  final List<PanchangaDay> days;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final String monthLabel = PanchangaDataUtils.kannadaMonthLabel(month);
+    final Map<String, List<DateTime>> groupedFestivals = <String, List<DateTime>>{};
+
+    for (final PanchangaDay day in days) {
+      for (final String rawFestival in day.festivals) {
+        final String festival = rawFestival.trim();
+        if (festival.isEmpty) {
+          continue;
+        }
+        groupedFestivals.putIfAbsent(festival, () => <DateTime>[]).add(day.date);
+      }
+    }
+
+    final List<_FestivalStaticEntry> curated = _curatedMonthlyFestivals2026[month.month] ?? <_FestivalStaticEntry>[];
+    for (final _FestivalStaticEntry entry in curated) {
+      groupedFestivals.putIfAbsent(entry.name, () => <DateTime>[]).add(entry.date);
+    }
+
+    final List<_MonthlyFestivalEntry> entries = groupedFestivals.entries
+        .map(
+          (MapEntry<String, List<DateTime>> entry) => _MonthlyFestivalEntry(
+            name: entry.key,
+            dates: (entry.value..sort()).map((DateTime d) => DateTime(d.year, d.month, d.day)).toList(),
+          ),
+        )
+        .toList()
+      ..sort((_MonthlyFestivalEntry a, _MonthlyFestivalEntry b) => a.dates.first.compareTo(b.dates.first));
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.12), width: 1.1),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(color: Color(0x140F172A), blurRadius: 18, offset: Offset(0, 10)),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'ಪ್ರಮುಖ ಸಂಭ್ರಮಗಳು • $monthLabel',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.notoSansKannada(fontSize: 19, fontWeight: FontWeight.w900, color: theme.colorScheme.primary),
+          ),
+          const SizedBox(height: 10),
+          if (entries.isEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 28),
+              alignment: Alignment.center,
+              child: Text(
+                'ಈ ತಿಂಗಳಿಗೆ ವಿಶೇಷ ಸಂಭ್ರಮಗಳು ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಪರಿಶೀಲಿಸಿ.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.65)),
+              ),
+            )
+          else
+            _MonthlyFestivalList(entries: entries),
+        ],
+      ),
+    );
+  }
+}
+
+class _MonthlyFestivalList extends StatelessWidget {
+  const _MonthlyFestivalList({required this.entries});
+
+  final List<_MonthlyFestivalEntry> entries;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool shouldScroll = entries.length > 3;
+    final double listHeight = math.min(320, entries.length * 74 + 16);
+
+    if (!shouldScroll) {
+      return Column(
+        children: entries
+            .map<Widget>(
+              (_MonthlyFestivalEntry entry) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _MonthlyFestivalListTile(entry: entry),
+              ),
+            )
+            .toList(),
+      );
+    }
+
+    return SizedBox(
+      height: listHeight,
+      child: ListView.separated(
+        itemCount: entries.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (BuildContext context, int index) => _MonthlyFestivalListTile(entry: entries[index]),
+      ),
+    );
+  }
+}
+
+class _MonthlyFestivalListTile extends StatelessWidget {
+  const _MonthlyFestivalListTile({required this.entry});
+
+  final _MonthlyFestivalEntry entry;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final DateFormat dateFormat = DateFormat('d MMMM', 'en_US');
+    final String dateLabel = entry.dates.isEmpty
+        ? ''
+        : entry.dates.map((DateTime date) => dateFormat.format(date)).join(', ');
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.16), width: 1),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            entry.name,
+            style: GoogleFonts.notoSansKannada(fontSize: 15.5, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+          ),
+          if (dateLabel.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 6),
+            Text(
+              dateLabel,
+              style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _MonthlyFestivalEntry {
+  _MonthlyFestivalEntry({required this.name, required this.dates});
+
+  final String name;
+  final List<DateTime> dates;
+}
+
+class _MonthlyRashiSection extends StatelessWidget {
+  const _MonthlyRashiSection({super.key, required this.month});
+
+  final DateTime month;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final String monthLabel = PanchangaDataUtils.kannadaMonthLabel(month);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.12), width: 1.1),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(color: Color(0x140F172A), blurRadius: 20, offset: Offset(0, 12)),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'ರಾಶಿ ಭವಿಷ್ಯ • $monthLabel',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.notoSansKannada(fontSize: 19, fontWeight: FontWeight.w900, color: theme.colorScheme.primary),
+          ),
+          const SizedBox(height: 16),
+          RashiBhavishyaPanel(
+            scrollable: false,
+            padding: EdgeInsets.zero,
+            initialMonth: monthLabel,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MonthlyPanchangaSection extends StatefulWidget {
+  const _MonthlyPanchangaSection({super.key, required this.month, required this.onShowFull});
+
+  final DateTime month;
+  final VoidCallback onShowFull;
+
+  @override
+  State<_MonthlyPanchangaSection> createState() => _MonthlyPanchangaSectionState();
+}
+
+class _MonthlyPanchangaSectionState extends State<_MonthlyPanchangaSection> {
+  static const int _initialPage = 1000;
+
+  late final PageController _pageController;
+  int _currentPage = _initialPage;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _initialPage);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  DateTime _monthForPage(int page) {
+    final int offset = page - _initialPage;
+    return DateTime(widget.month.year, widget.month.month + offset, 1);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final DateTime activeMonth = _monthForPage(_currentPage);
+    final String monthLabel = PanchangaDataUtils.kannadaMonthLabel(activeMonth);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.12), width: 1.1),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(color: Color(0x140F172A), blurRadius: 18, offset: Offset(0, 10)),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          Text(
+            'ಪಂಚಾಂಗ',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.notoSansKannada(fontSize: 19, fontWeight: FontWeight.w900, color: theme.colorScheme.primary),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'ಮಾಸಿಕ ಪಂಚಾಂಗವನ್ನು ನೋಡಲು ಎಡ-ಬಲಕ್ಕೆ ಸ್ವೈಪ್ ಮಾಡಿ',
+            textAlign: TextAlign.center,
+            style: GoogleFonts.notoSansKannada(fontSize: 13.5, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+          ),
+          const SizedBox(height: 18),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: SizedBox(
+              height: 460,
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: (int page) => setState(() => _currentPage = page),
+                itemBuilder: (BuildContext context, int index) {
+                  final DateTime month = _monthForPage(index);
+                  return _PanchangaWebViewPage(month: month);
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
+          Row(
+            children: <Widget>[
+              _PanchangaNavButton(
+                icon: Icons.chevron_left_rounded,
+                onTap: () => _pageController.previousPage(duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(
+                      '$monthLabel ${activeMonth.year}',
+                      style: GoogleFonts.notoSansKannada(fontSize: 16, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      DateFormat('MMMM yyyy').format(activeMonth),
+                      style: GoogleFonts.notoSansKannada(fontSize: 12.5, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.65)),
+                    ),
+                  ],
+                ),
+              ),
+              _PanchangaNavButton(
+                icon: Icons.chevron_right_rounded,
+                onTap: () => _pageController.nextPage(duration: const Duration(milliseconds: 320), curve: Curves.easeOutCubic),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              onPressed: widget.onShowFull,
+              icon: const Icon(Icons.open_in_new_rounded, size: 18),
+              label: Text(
+                'ಪೂರ್ಣ ಪಂಚಾಂಗ ನೋಡಿ',
+                style: GoogleFonts.notoSansKannada(fontSize: 13.5, fontWeight: FontWeight.w700),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _PanchangaNavButton extends StatelessWidget {
+  const _PanchangaNavButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
+        icon: Icon(icon),
+        color: theme.colorScheme.primary,
+        onPressed: onTap,
+      ),
+    );
+  }
+}
+
+class _PanchangaWebViewPage extends StatefulWidget {
+  const _PanchangaWebViewPage({required this.month});
+
+  final DateTime month;
+
+  @override
+  State<_PanchangaWebViewPage> createState() => _PanchangaWebViewPageState();
+}
+
+class _PanchangaWebViewPageState extends State<_PanchangaWebViewPage> {
+  late final WebViewController _controller;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0xFFF8FAFC))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageStarted: (_) => setState(() => _isLoading = true),
+          onPageFinished: (_) => setState(() => _isLoading = false),
+          onWebResourceError: (_) => setState(() => _isLoading = false),
+        ),
+      );
+    _loadMonth(widget.month);
+  }
+
+  @override
+  void didUpdateWidget(covariant _PanchangaWebViewPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.month.year != widget.month.year || oldWidget.month.month != widget.month.month) {
+      _loadMonth(widget.month);
+    }
+  }
+
+  void _loadMonth(DateTime month) {
+    final String formattedMonth = month.month.toString().padLeft(2, '0');
+    final String imageUrl = 'https://kannadacalendar.in/wp-content/kannada/panchanga/${month.year}/$formattedMonth-${month.year}.jpg';
+    final String html = '''
+<!DOCTYPE html><html lang="kn"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>html,body{margin:0;padding:0;background:#f8fafc;}img{display:block;width:100%;height:auto;}</style></head><body><img src="$imageUrl" alt="Panchanga" /></body></html>
+''';
+    _controller.loadHtmlString(html);
+    setState(() => _isLoading = true);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      fit: StackFit.expand,
+      children: <Widget>[
+        WebViewWidget(controller: _controller),
+        if (_isLoading)
+          const Center(
+            child: CircularProgressIndicator(),
+          ),
+      ],
+    );
+  }
 }
 
 class _MantraTabContent extends StatelessWidget {
@@ -1897,7 +2892,6 @@ enum _HomeSection { daily, monthly, mantra, festivals }
 enum _DailyNavAction { yesterday, today, tomorrow }
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
-  static const MethodChannel _panchangaChannel = MethodChannel('com.dailycalendar.kannada/panchanga');
 
   late TabController _tabController;
   late List<DateTime> _months;
@@ -1913,6 +2907,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late Timer _clockTimer;
   late DateTime _headerDateTime;
   late DateTime _calendarDate;
+  bool _drawerOpen = false;
 
   @override
   void initState() {
@@ -1953,21 +2948,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     });
   }
 
-  Future<void> _launchNativePanchanga() async {
+  void _openWebPanchanga() {
     final DateTime month = _monthlyMonth;
-    try {
-      await _panchangaChannel.invokeMethod<void>('showPanchanga', <String, int>{
-        'month': month.month,
-        'year': month.year,
-      });
-    } on PlatformException catch (error) {
-      if (!mounted) {
-        return;
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ಪಂಚಾಂಗ ತೆರೆಯಲು ಸಾಧ್ಯವಾಗಲಿಲ್ಲ: ${error.message ?? 'ಅಜ್ಞಾತ ದೋಷ'}')),
-      );
-    }
+    Navigator.of(context).push(
+      MaterialPageRoute<PanchangaImageScreen>(
+        builder: (_) => PanchangaImageScreen(month: month.month, year: month.year),
+      ),
+    );
   }
 
   void _openMonthlyPanchanga(BuildContext context, DateTime month) {
@@ -2165,7 +3152,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _activeNavAction = _DailyNavAction.yesterday;
     });
     Future<void>.microtask(() {
-      _loadCalendar(_calendarDate.subtract(const Duration(days: 1)));
+      final DateTime target = _calendarDate.subtract(const Duration(days: 1));
+      final AppState state = Provider.of<AppState>(context, listen: false);
+      state.onDaySelected(target, DateTime(target.year, target.month, 1));
+      _loadCalendar(target);
       if (!mounted) {
         return;
       }
@@ -2185,7 +3175,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _activeNavAction = _DailyNavAction.today;
     });
     Future<void>.microtask(() {
-      _loadCalendar(DateUtils.dateOnly(DateTime.now()));
+      final DateTime target = DateUtils.dateOnly(DateTime.now());
+      final AppState state = Provider.of<AppState>(context, listen: false);
+      state.onDaySelected(target, DateTime(target.year, target.month, 1));
+      _loadCalendar(target);
       if (!mounted) {
         return;
       }
@@ -2208,7 +3201,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _activeNavAction = _DailyNavAction.tomorrow;
     });
     Future<void>.microtask(() {
-      _loadCalendar(_calendarDate.add(const Duration(days: 1)));
+      final DateTime target = _calendarDate.add(const Duration(days: 1));
+      final AppState state = Provider.of<AppState>(context, listen: false);
+      state.onDaySelected(target, DateTime(target.year, target.month, 1));
+      _loadCalendar(target);
       if (!mounted) {
         return;
       }
@@ -2240,7 +3236,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   String _formattedTime(DateTime dateTime) {
-    return DateFormat('hh:mm:ss a').format(dateTime);
+    return DateFormat('hh:mm a', 'kn_IN').format(dateTime);
   }
 
   String _calendarImageUrl(DateTime date) {
@@ -2268,11 +3264,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     final Widget dailyContent = _DailyContent(
       selectedMonth: _dailyMonth,
       today: today,
-      monthCells: monthCells,
-      calendarDate: _calendarDate,
-      formattedDate: _formattedKannadaDate(_calendarDate),
+      monthCells: PanchangaDataUtils.monthCells(_dailyMonth),
+      calendarDate: state.selectedDay,
+      formattedDate: DateFormat('d MMMM y', 'kn_IN').format(state.selectedDay),
       formattedTime: _formattedTime(_headerDateTime),
-      calendarImageUrl: _calendarImageUrl(_calendarDate),
+      calendarImageUrl: _calendarImageUrl(state.selectedDay),
       onDaySheet: (DateTime date) => _openDaySheet(context, date, state),
       onYesterday: _loadYesterdayCalendar,
       onToday: _loadTodayCalendar,
@@ -2283,11 +3279,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       tomorrowLabelUpdated: _tomorrowLabelUpdated,
       isLoading: _isDayTransitioning,
       loadingAction: _activeNavAction,
+      annotations: state.dayAnnotations,
     );
 
     final Widget monthlyContent = _MonthlyContent(
       month: _monthlyMonth,
-      onShowPanchanga: _launchNativePanchanga,
+      onShowPanchanga: _openWebPanchanga,
     );
     final Widget mantraContent = const _MantraTabContent();
     final Widget festivalsContent = _FestivalsContent(
@@ -2295,180 +3292,159 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       onDayTap: (DateTime date) => _openDaySheet(context, date, state),
     );
 
-    return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          const _TempleBackdrop(),
-          SafeArea(
-            child: Column(
-              children: <Widget>[
-                _HeaderStrip(year: headerMonth.year),
-                const SizedBox(height: 10),
-                if (_section == _HomeSection.monthly) ...<Widget>[
-                  _MonthTabBar(controller: _tabController, months: _months),
-                  const SizedBox(height: 12),
-                ],
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    onPageChanged: (int page) {
-                      if (page >= _HomeSection.values.length) {
-                        return;
-                      }
-                      setState(() {
-                        _section = _HomeSection.values[page];
-                        _navIndex = page;
-                      });
-                    },
+    return _HomeScreenScope(
+      state: this,
+      child: Scaffold(
+        body: Stack(
+          children: <Widget>[
+            const _TempleBackdrop(),
+            SafeArea(
+              child: Stack(
+                children: <Widget>[
+                  Column(
                     children: <Widget>[
-                      dailyContent,
-                      monthlyContent,
-                      mantraContent,
-                      festivalsContent,
+                      _TopBar(
+                        year: headerMonth.year,
+                        onMenuTap: () => setState(() => _drawerOpen = true),
+                      ),
+                      const SizedBox(height: 10),
+                      if (_section == _HomeSection.monthly) ...<Widget>[
+                        _MonthTabBar(controller: _tabController, months: _months),
+                        const SizedBox(height: 12),
+                      ],
+                      Expanded(
+                        child: PageView(
+                          controller: _pageController,
+                          onPageChanged: (int page) {
+                            if (page >= _HomeSection.values.length) {
+                              return;
+                            }
+                            setState(() {
+                              _section = _HomeSection.values[page];
+                              _navIndex = page;
+                            });
+                          },
+                          children: <Widget>[
+                            dailyContent,
+                            monthlyContent,
+                            mantraContent,
+                            festivalsContent,
+                          ],
+                        ),
+                      ),
                     ],
                   ),
-                ),
-              ],
+                  if (_drawerOpen)
+                    Positioned.fill(
+                      child: GestureDetector(
+                        onTap: () => setState(() => _drawerOpen = false),
+                        child: Container(color: Colors.black.withValues(alpha: 0.35)),
+                      ),
+                    ),
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 240),
+                    curve: Curves.easeOut,
+                    top: 16,
+                    bottom: 16,
+                    left: _drawerOpen ? 0 : -MediaQuery.of(context).size.width * 0.6,
+                    child: _HomeDrawer(
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      onClose: () => setState(() => _drawerOpen = false),
+                      onNavigate: (int index) {
+                        setState(() => _drawerOpen = false);
+                        if (index < _HomeSection.values.length) {
+                          _navigateToSection(_HomeSection.values[index]);
+                        }
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: _BottomNavBar(
-        currentIndex: _navIndex,
-        onTap: (int index) async {
-          if (index == _navIndex) {
-            return;
-          }
-          switch (index) {
-            case 0:
-              setState(() {
-                _section = _HomeSection.daily;
-                _navIndex = index;
-              });
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-              break;
-            case 1:
-              setState(() {
-                _section = _HomeSection.monthly;
-                _navIndex = index;
-              });
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-              break;
-            case 2:
-              setState(() {
-                _section = _HomeSection.mantra;
-                _navIndex = index;
-              });
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-              break;
-            case 3:
-              setState(() {
-                _section = _HomeSection.festivals;
-                _navIndex = index;
-              });
-              _pageController.animateToPage(
-                index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOut,
-              );
-              break;
-            default:
-              setState(() {
-                _section = _HomeSection.daily;
-                _navIndex = index;
-              });
-          }
-        },
+          ],
+        ),
+        bottomNavigationBar: _BottomNavBar(
+          currentIndex: _navIndex,
+          onTap: (int index) {
+            if (index < _HomeSection.values.length) {
+              _navigateToSection(_HomeSection.values[index]);
+            }
+          },
+        ),
       ),
     );
   }
 
-  void _openDaySheet(BuildContext context, DateTime date, AppState state) {
+  void _handleMenuTap() {
+    _openHomeMenu();
+  }
+
+  Future<void> _openHomeMenu() async {
+    final _HomeSection? selection = await Navigator.of(context).push<_HomeSection>(
+      MaterialPageRoute<_HomeSection>(
+        builder: (BuildContext context) => HomeMenuPage(currentSection: _section),
+      ),
+    );
+    if (selection != null) {
+      _navigateToSection(selection);
+    }
+  }
+
+  void _navigateToSection(_HomeSection section) {
+    final int targetIndex = section.index;
+    if (_navIndex == targetIndex && _section == section) {
+      return;
+    }
+    setState(() {
+      _section = section;
+      _navIndex = targetIndex;
+    });
+    _pageController.animateToPage(
+      targetIndex,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  Future<void> _openDaySheet(BuildContext context, DateTime date, AppState state) async {
     final ThemeData theme = Theme.of(context);
     final PanchangaDay? details = PanchangaDataUtils.dayFor(date);
     final LinkedHashSet<String> events = LinkedHashSet<String>.from(PanchangaDataUtils.festivalsFor(date));
     final String dayNameKannada = DateFormat('EEEE', 'kn_IN').format(date);
     final String monthNameKannada = DateFormat('MMMM', 'kn_IN').format(date);
     final String formattedDateLabel = '$dayNameKannada, ${date.day} $monthNameKannada ${date.year}';
+    final DayAnnotation? existingAnnotation = state.annotationForDay(date);
 
-    showModalBottomSheet<void>(
+    final _AnnotationResult? result = await showModalBottomSheet<_AnnotationResult>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: GlassCard(
-            borderRadius: 28,
-            padding: const EdgeInsets.all(24),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Center(
-                    child: Container(
-                      width: 64,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 18),
-                  Text(
-                    formattedDateLabel,
-                    style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w700),
-                  ),
-                  const SizedBox(height: 18),
-                  _detailRow(theme, 'ತಿಥಿ', details?.tithi ?? '—'),
-                  _detailRow(theme, 'ಪಕ್ಷ', details?.paksha ?? '—'),
-                  _detailRow(theme, 'ನಕ್ಷತ್ರ', details?.nakshatra ?? '—'),
-                  _detailRow(theme, 'ಯೋಗ', details?.yoga ?? '—'),
-                  _detailRow(theme, 'ಕರಣ', details?.karana ?? '—'),
-                  if (events.isNotEmpty) ...<Widget>[
-                    const SizedBox(height: 18),
-                    Text(
-                      'ಉತ್ಸವಗಳು',
-                      style: GoogleFonts.notoSansKannada(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: theme.colorScheme.secondary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    ...events.map(
-                      (String festival) => Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: Text('• $festival', style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w600)),
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 20),
-                  Text('ದಿನದ ಶಬ್ದ', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-                  const SizedBox(height: 6),
-                  Text(state.dailyShabad.title, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 6),
-                  Text(state.dailyShabad.gurmukhi, style: theme.textTheme.bodyMedium?.copyWith(height: 1.4)),
-                ],
-              ),
-            ),
-          ),
+        return _DayAnnotationSheet(
+          formattedDateLabel: formattedDateLabel,
+          details: details,
+          events: events.toList(),
+          existingAnnotation: existingAnnotation,
+          shabadTitle: state.dailyShabad.title,
+          shabadGurmukhi: state.dailyShabad.gurmukhi,
         );
       },
     );
+    if (result == null) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+    final AppState appState = Provider.of<AppState>(context, listen: false);
+    if (result.shouldClear) {
+      appState.clearAnnotation(date);
+      return;
+    }
+    final DayAnnotation? annotation = result.annotation;
+    if (annotation != null) {
+      appState.saveAnnotation(date, annotation);
+    }
   }
 
   static Widget _detailRow(ThemeData theme, String label, String value) {
@@ -2533,50 +3509,217 @@ class _CalendarNavIcon extends StatelessWidget {
   }
 }
 
-class _HeaderStrip extends StatelessWidget {
-  const _HeaderStrip({required this.year});
+class _TopBar extends StatelessWidget {
+  const _TopBar({required this.year, required this.onMenuTap});
 
   final int year;
+  final VoidCallback onMenuTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: <Color>[Color(0xFF0F4AA3), Color(0xFF1E88E5)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: const <BoxShadow>[
-          BoxShadow(color: Color(0x400F4AA3), blurRadius: 16, offset: Offset(0, 8)),
-        ],
-      ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'ಸನಾತನ ಪಂಚಾಂಗ',
-                style: GoogleFonts.notoSansKannada(fontSize: 24, fontWeight: FontWeight.w800, color: Colors.white),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Sanātana Panchanga • $year',
-                style: GoogleFonts.notoSansKannada(fontSize: 14.5, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.82)),
-              ),
-            ],
+          IconButton(
+            onPressed: onMenuTap,
+            tooltip: 'ಮೆನು',
+            icon: const Icon(Icons.menu_rounded, color: Color(0xFF0F172A)),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            ),
           ),
-          const Icon(Icons.temple_hindu, color: Colors.white, size: 32),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 18),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: <Color>[Color(0xFF0F4AA3), Color(0xFF1E88E5)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(22),
+                boxShadow: const <BoxShadow>[
+                  BoxShadow(color: Color(0x330F4AA3), blurRadius: 14, offset: Offset(0, 8)),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    'ಕನ್ನಡ ಕ್ಯಾಲೆಂಡರ್',
+                    style: GoogleFonts.notoSansKannada(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Sanātana Panchanga • $year',
+                    style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.85)),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
+}
+
+class _HomeDrawer extends StatelessWidget {
+  const _HomeDrawer({required this.width, required this.onClose, required this.onNavigate});
+
+  final double width;
+  final VoidCallback onClose;
+  final ValueChanged<int> onNavigate;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<_HomeSection> sections = _HomeSection.values;
+    final List<String> labels = <String>['ದೈನಂದಿನ', 'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್', 'ಧ್ಯಾನ / ಪ್ರಾರ್ಥನೆ', 'ಉತ್ಸವಗಳು'];
+    final List<IconData> icons = <IconData>[Icons.calendar_today_rounded, Icons.calendar_month_rounded, Icons.self_improvement_rounded, Icons.celebration_rounded];
+
+    return SizedBox(
+      width: width,
+      child: Container(
+        margin: const EdgeInsets.only(left: 12, right: 8),
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.only(topRight: Radius.circular(30), bottomRight: Radius.circular(30)),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(color: Color(0x330F172A), blurRadius: 24, offset: Offset(6, 12)),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text('ಮೆನು', style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: const Color(0xFF0F4AA3))),
+                IconButton(
+                  onPressed: onClose,
+                  icon: const Icon(Icons.close_rounded),
+                  color: const Color(0xFF0F4AA3),
+                ),
+              ],
+            ),
+            const Divider(height: 26, thickness: 1.2),
+            for (int i = 0; i < sections.length; i++)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: ElevatedButton.icon(
+                  onPressed: () => onNavigate(i),
+                  icon: Icon(icons[i], size: 22),
+                  label: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(labels[i], style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700)),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    alignment: Alignment.centerLeft,
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 14),
+                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFF0F4AA3),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    elevation: 3,
+                  ),
+                ),
+              ),
+            const Spacer(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class HomeMenuPage extends StatelessWidget {
+  const HomeMenuPage({super.key, required this.currentSection});
+
+  final _HomeSection currentSection;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final List<_HomeMenuOption> options = <_HomeMenuOption>[
+      _HomeMenuOption(
+        label: 'ದೈನಂದಿನ',
+        section: _HomeSection.daily,
+        icon: Icons.calendar_today_rounded,
+      ),
+      _HomeMenuOption(
+        label: 'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್',
+        section: _HomeSection.monthly,
+        icon: Icons.calendar_month_rounded,
+      ),
+      _HomeMenuOption(
+        label: 'ಧ್ಯಾನ / ಮಂತ್ರಗಳು',
+        section: _HomeSection.mantra,
+        icon: Icons.self_improvement_rounded,
+      ),
+      _HomeMenuOption(
+        label: 'ಉತ್ಸವಗಳು',
+        section: _HomeSection.festivals,
+        icon: Icons.celebration_rounded,
+      ),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('ಮೆನು'),
+      ),
+      body: ListView.separated(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        itemCount: options.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 12),
+        itemBuilder: (BuildContext context, int index) {
+          final _HomeMenuOption option = options[index];
+          final bool selected = option.section == currentSection;
+          return ListTile(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            tileColor: selected ? theme.colorScheme.primary.withValues(alpha: 0.1) : theme.colorScheme.surface,
+            iconColor: theme.colorScheme.primary,
+            leading: Icon(option.icon, size: 26),
+            title: Text(
+              option.label,
+              style: GoogleFonts.notoSansKannada(fontSize: 16, fontWeight: FontWeight.w700, color: theme.colorScheme.primary),
+            ),
+            onTap: () => Navigator.of(context).pop<_HomeSection>(option.section),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _HomeMenuOption {
+  const _HomeMenuOption({required this.label, required this.section, required this.icon});
+
+  final String label;
+  final _HomeSection section;
+  final IconData icon;
+}
+
+class _HomeScreenScope extends InheritedWidget {
+  const _HomeScreenScope({required this.state, required super.child});
+
+  final _HomeScreenState state;
+
+  _HomeSection get section => state._section;
+
+  void navigateToSection(_HomeSection section) => state._navigateToSection(section);
+
+  static _HomeScreenScope of(BuildContext context) {
+    final _HomeScreenScope? scope = context.dependOnInheritedWidgetOfExactType<_HomeScreenScope>();
+    assert(scope != null, 'HomeScreen scope is not available in the context');
+    return scope!;
+  }
+
+  @override
+  bool updateShouldNotify(_HomeScreenScope oldWidget) => state != oldWidget.state;
 }
 
 class _MonthTabBar extends StatelessWidget {
@@ -2645,6 +3788,7 @@ class _DailyContent extends StatelessWidget {
     required this.tomorrowLabelUpdated,
     required this.isLoading,
     required this.loadingAction,
+    required this.annotations,
   });
 
   final DateTime selectedMonth;
@@ -2664,6 +3808,7 @@ class _DailyContent extends StatelessWidget {
   final bool tomorrowLabelUpdated;
   final bool isLoading;
   final _DailyNavAction? loadingAction;
+  final Map<DateTime, DayAnnotation> annotations;
 
   @override
   Widget build(BuildContext context) {
@@ -2716,6 +3861,7 @@ class _DailyContent extends StatelessWidget {
             onDayTap: (DateTime date) => onDaySheet(date),
             onPrevMonth: onPrevMonth,
             onNextMonth: onNextMonth,
+            annotations: annotations,
           ),
           const SizedBox(height: 32),
         ],
@@ -2724,69 +3870,161 @@ class _DailyContent extends StatelessWidget {
   }
 }
 
-class _MonthlyContent extends StatelessWidget {
+class _MonthlyContent extends StatefulWidget {
   const _MonthlyContent({required this.month, required this.onShowPanchanga});
 
   final DateTime month;
   final VoidCallback onShowPanchanga;
 
   @override
+  State<_MonthlyContent> createState() => _MonthlyContentState();
+}
+
+class _MonthlyContentState extends State<_MonthlyContent> {
+  @override
+  void initState() {
+    super.initState();
+    InterstitialAdManager.instance.preload();
+  }
+
+  void _openRashiPage() {
+    final String initialMonth = PanchangaDataUtils.kannadaMonthLabel(widget.month);
+    InterstitialAdManager.instance.showAd(onAdDismissed: () {
+      if (!mounted) {
+        return;
+      }
+      Navigator.of(context).push(_MonthlySlidePageRoute(
+        builder: (BuildContext context) => RashiBhavishyaScreen(initialMonth: initialMonth),
+      ));
+    });
+  }
+
+  void _openPanchangaPage() {
+    InterstitialAdManager.instance.showAd(onAdDismissed: () {
+      if (!mounted) {
+        return;
+      }
+      Navigator.of(context).push(_MonthlySlidePageRoute(
+        builder: (BuildContext context) => PanchangaImageScreen(month: widget.month.month, year: widget.month.year),
+      ));
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final String? monthImage = PanchangaDataUtils.monthImageAsset(month);
+    final ThemeData theme = Theme.of(context);
+    final List<PanchangaDay> days = PanchangaDataUtils.daysForMonth(widget.month);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          if (monthImage != null) ...<Widget>[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(22),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1.2),
-                  boxShadow: const <BoxShadow>[
-                    BoxShadow(color: Color(0x140F172A), blurRadius: 14, offset: Offset(0, 8)),
-                  ],
-                ),
-                child: Image.asset(
-                  monthImage,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
-                    height: 320,
-                    color: const Color(0xFFE2E8F0),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'ಚಿತ್ರ ಲಭ್ಯವಿಲ್ಲ',
-                      style: GoogleFonts.notoSansKannada(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF64748B)),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
-          ],
-          Align(
-            alignment: Alignment.centerRight,
-            child: ElevatedButton.icon(
-              onPressed: onShowPanchanga,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0F4AA3),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                textStyle: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                elevation: 4,
-              ),
-              icon: const Icon(Icons.menu_book_rounded, size: 20),
-              label: const Text('ಪಂಚಾಂಗ'),
-            ),
-          ),
+          _MonthlyCalendarImage(month: widget.month),
           const SizedBox(height: 20),
-          _MonthlyHighlights(month: month),
-          const SizedBox(height: 60),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: _MonthlyActionButton(
+                  label: 'ರಾಶಿ ಭವಿಷ್ಯ',
+                  icon: Icons.auto_awesome_rounded,
+                  onPressed: _openRashiPage,
+                  theme: theme,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MonthlyActionButton(
+                  label: 'ಪಂಚಾಂಗ',
+                  icon: Icons.menu_book_rounded,
+                  onPressed: _openPanchangaPage,
+                  theme: theme,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          _MonthlyFestivalsSection(
+            month: widget.month,
+            days: days,
+          ),
+          const SizedBox(height: 48),
         ],
       ),
+    );
+  }
+}
+
+class _MonthlyCalendarImage extends StatelessWidget {
+  const _MonthlyCalendarImage({required this.month});
+
+  final DateTime month;
+
+  @override
+  Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final String? assetPath = PanchangaDataUtils.monthImageAsset(month);
+    final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/panchanga/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
+
+    Widget image;
+    if (assetPath != null) {
+      image = Image.asset(
+        assetPath,
+        fit: BoxFit.cover,
+        alignment: Alignment.topCenter,
+        errorBuilder: (_, __, ___) => _MonthlyCalendarFallback(url: networkUrl),
+      );
+    } else {
+      image = _MonthlyCalendarFallback(url: networkUrl);
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        Text(
+          '${PanchangaDataUtils.kannadaMonthLabel(month)} ${month.year}',
+          style: GoogleFonts.notoSansKannada(fontSize: 20, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+        ),
+        const SizedBox(height: 12),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: AspectRatio(
+            aspectRatio: 3 / 4,
+            child: image,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _MonthlyCalendarFallback extends StatelessWidget {
+  const _MonthlyCalendarFallback({required this.url});
+
+  final String url;
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      alignment: Alignment.topCenter,
+      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
+        if (progress == null) {
+          return child;
+        }
+        return const Center(child: CircularProgressIndicator());
+      },
+      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+        return Container(
+          color: const Color(0xFFE2E8F0),
+          alignment: Alignment.center,
+          child: Text(
+            'ಮಾಸಿಕ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
+            style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF64748B)),
+          ),
+        );
+      },
     );
   }
 }
@@ -3077,6 +4315,7 @@ class _CalendarBoard extends StatelessWidget {
     required this.onDayTap,
     required this.onPrevMonth,
     required this.onNextMonth,
+    required this.annotations,
   });
 
   final DateTime month;
@@ -3085,6 +4324,7 @@ class _CalendarBoard extends StatelessWidget {
   final ValueChanged<DateTime> onDayTap;
   final VoidCallback onPrevMonth;
   final VoidCallback onNextMonth;
+  final Map<DateTime, DayAnnotation> annotations;
 
   @override
   Widget build(BuildContext context) {
@@ -3187,6 +4427,7 @@ class _CalendarBoard extends StatelessWidget {
                 final bool isSunday = date.weekday == DateTime.sunday;
                 final List<String> festivals = PanchangaDataUtils.festivalsFor(date);
                 final PanchangaDay? info = PanchangaDataUtils.dayFor(date);
+                final DayAnnotation? annotation = annotations[DateTime(date.year, date.month, date.day)];
 
                 return _CalendarCell(
                   date: date,
@@ -3195,6 +4436,7 @@ class _CalendarBoard extends StatelessWidget {
                   isCurrentMonth: isCurrentMonth,
                   isToday: isToday,
                   isSunday: isSunday,
+                  annotation: annotation,
                   onTap: () => onDayTap(date),
                 );
               },
@@ -3214,6 +4456,7 @@ class _CalendarCell extends StatelessWidget {
     required this.isCurrentMonth,
     required this.isToday,
     required this.isSunday,
+    required this.annotation,
     required this.onTap,
   });
 
@@ -3223,24 +4466,36 @@ class _CalendarCell extends StatelessWidget {
   final bool isCurrentMonth;
   final bool isToday;
   final bool isSunday;
+  final DayAnnotation? annotation;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final bool hasFestival = festivals.isNotEmpty;
-    final Color baseAccent = isToday
+    final _NoteHighlightPalette? highlightPalette = annotation?.colorKey != null
+        ? _noteHighlightPalettes[annotation!.colorKey]
+        : null;
+    final bool hasAnnotation = annotation != null && annotation!.hasContent;
+
+    Color baseAccent = isToday
         ? const Color(0xFF16A34A)
         : (hasFestival ? const Color(0xFFB91C1C) : (isSunday ? const Color(0xFFDC2626) : const Color(0xFF0F172A)));
-    final Color background = !isCurrentMonth
+    Color background = !isCurrentMonth
         ? const Color(0xFFF1F5F9)
         : (isToday
             ? const Color(0xFFD1FAE5)
             : (hasFestival
                 ? const Color(0xFFFEE2E2)
                 : (isSunday ? const Color(0xFFFEE2E2) : Colors.white)));
-    final Color borderColor = isCurrentMonth
+    Color borderColor = isCurrentMonth
         ? (isToday ? const Color(0xFF16A34A) : const Color(0xFFE2E8F0))
         : const Color(0xFFE2E8F0);
+
+    if (highlightPalette != null && isCurrentMonth) {
+      background = highlightPalette.accent.withValues(alpha: 0.18);
+      borderColor = highlightPalette.accent.withValues(alpha: 0.85);
+      baseAccent = highlightPalette.accent;
+    }
 
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 200),
@@ -3269,7 +4524,7 @@ class _CalendarCell extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              if (hasFestival)
+              if (!hasAnnotation && hasFestival)
                 Align(
                   alignment: Alignment.bottomRight,
                   child: Container(
@@ -3287,14 +4542,15 @@ class _CalendarCell extends StatelessWidget {
 }
 
 class _MonthlyHighlights extends StatelessWidget {
-  const _MonthlyHighlights({required this.month});
+  const _MonthlyHighlights({required this.month, List<PanchangaDay>? days}) : _days = days;
 
   final DateTime month;
+  final List<PanchangaDay>? _days;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final List<PanchangaDay> days = PanchangaDataUtils.daysForMonth(month);
+    final List<PanchangaDay> days = _days ?? PanchangaDataUtils.daysForMonth(month);
     final List<PanchangaDay> festivalDays = days.where((PanchangaDay day) => (day.festivals?.isNotEmpty ?? false)).take(3).toList();
 
     final PanchangaDay? amavasyaDay = _matchTithi(days, 'amavasya');
