@@ -1,0 +1,29 @@
+name: kannada_calendar
+description: A Kannada Calendar App in Flutter
+publish_to: "none" # Remove this line if publishing
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.1.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  table_calendar: ^3.2.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.0.15
+  flutter_colorpicker: ^1.0.4
+  shared_preferences: ^2.2.0
+  flutter_localization: 
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.3
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
