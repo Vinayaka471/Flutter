@@ -3960,7 +3960,7 @@ class _MonthlyContentState extends State<_MonthlyContent> {
           ),
           const SizedBox(height: 4),
           Expanded(
-            flex: 1000 // Maximum size - calendar covers entire screen
+            flex: 1000, // Maximum size - calendar covers entire screen
             child: _MonthlyCalendarImage(month: widget.month),
           ),
           const SizedBox(height: 8),
@@ -4010,19 +4010,19 @@ class _MonthlyCalendarImage extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFFE2E8F0),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE0E7FF), width: 1.2),
+        color: Colors.transparent, // Made transparent for full screen effect
+        borderRadius: BorderRadius.circular(8), // Reduced border radius for more screen space
+        border: Border.all(color: const Color(0xFFE0E7FF), width: 0.5), // Reduced border width
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(8), // Matching reduced border radius
         child: SizedBox(
           width: double.infinity,
           height: double.infinity, // Take all available space
           child: assetPath != null
             ? Image.asset(
                 assetPath,
-                fit: BoxFit.contain,
+                fit: BoxFit.cover, // Changed to cover for full screen effect
                 width: double.infinity,
                 height: double.infinity,
                 errorBuilder: (_, __, ___) => _MonthlyCalendarFallback(url: networkUrl),
@@ -4046,7 +4046,7 @@ class _MonthlyCalendarFallback extends StatelessWidget {
       height: double.infinity, // Fill all available space
       child: Image.network(
         url,
-        fit: BoxFit.contain, // Changed back to contain to show full image
+        fit: BoxFit.cover, // Changed to cover for full screen effect
         width: double.infinity,
         height: double.infinity,
         loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
@@ -4057,7 +4057,7 @@ class _MonthlyCalendarFallback extends StatelessWidget {
         },
         errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
           return Container(
-            color: const Color(0xFFE2E8F0),
+            color: Colors.transparent, // Made transparent for consistency
             alignment: Alignment.center,
             child: Text(
               'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
