@@ -3939,6 +3939,68 @@ class _MonthlyContentState extends State<_MonthlyContent> {
     });
   }
 
+  void _openZoomableCalendar(BuildContext context, DateTime month) {
+    final String? assetPath = PanchangaDataUtils.monthImageAsset(month);
+    final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/monthly/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
+
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (BuildContext context) => Scaffold(
+          appBar: AppBar(
+            title: Text(
+              'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ - ${PanchangaDataUtils.kannadaMonthLabel(month)} ${month.year}',
+              style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+            backgroundColor: const Color(0xFF1E3A8A),
+            foregroundColor: Colors.white,
+          ),
+          body: Container(
+            color: Colors.black,
+            child: InteractiveViewer(
+              panEnabled: true,
+              scaleEnabled: true,
+              minScale: 0.5,
+              maxScale: 5.0,
+              child: Center(
+                child: assetPath != null
+                  ? Image.asset(
+                      assetPath,
+                      fit: BoxFit.contain,
+                    )
+                  : Image.network(
+                      networkUrl,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
+                        if (progress == null) {
+                          return child;
+                        }
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        );
+                      },
+                      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                        return const Center(
+                          child: Text(
+                            'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        );
+                      },
+                    ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
@@ -3949,26 +4011,29 @@ class _MonthlyContentState extends State<_MonthlyContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          // Minimal text for maximum calendar space
           Text(
             PanchangaDataUtils.kannadaMonthLabel(widget.month),
-            style: GoogleFonts.notoSansKannada(fontSize: 20, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+            style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.primary),
           ),
-          const SizedBox(height: 2),
           Text(
             '${widget.month.year}',
-            style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
+            style: GoogleFonts.notoSansKannada(fontSize: 10, fontWeight: FontWeight.w500, color: theme.colorScheme.primary.withValues(alpha: 0.6)),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 1),
           Expanded(
             flex: 1000, // Maximum size - calendar covers entire screen
-            child: _MonthlyCalendarImage(month: widget.month),
+            child: _MonthlyCalendarImage(
+              month: widget.month,
+              onTap: () => _openZoomableCalendar(context, widget.month),
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 2), // Minimal spacing
           _MonthlyHighlights(
             month: widget.month,
             days: days,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4), // Reduced spacing
           Row(
             children: <Widget>[
               Expanded(
@@ -3997,9 +4062,10 @@ class _MonthlyContentState extends State<_MonthlyContent> {
 }
 
 class _MonthlyCalendarImage extends StatelessWidget {
-  const _MonthlyCalendarImage({required this.month});
+  const _MonthlyCalendarImage({required this.month, this.onTap});
 
   final DateTime month;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -4019,15 +4085,18 @@ class _MonthlyCalendarImage extends StatelessWidget {
         child: SizedBox(
           width: double.infinity,
           height: double.infinity, // Take all available space
-          child: assetPath != null
-            ? Image.asset(
-                assetPath,
-                fit: BoxFit.cover, // Changed to cover for full screen effect
-                width: double.infinity,
-                height: double.infinity,
-                errorBuilder: (_, __, ___) => _MonthlyCalendarFallback(url: networkUrl),
-              )
-            : _MonthlyCalendarFallback(url: networkUrl),
+          child: GestureDetector(
+            onTap: onTap,
+            child: assetPath != null
+              ? Image.asset(
+                  assetPath,
+                  fit: BoxFit.contain, // Changed to contain for full vertical visibility
+                  width: double.infinity,
+                  height: double.infinity,
+                  errorBuilder: (_, __, ___) => _MonthlyCalendarFallback(url: networkUrl, onTap: onTap),
+                )
+              : _MonthlyCalendarFallback(url: networkUrl, onTap: onTap),
+          ),
         ),
       ),
     );
@@ -4035,36 +4104,40 @@ class _MonthlyCalendarImage extends StatelessWidget {
 }
 
 class _MonthlyCalendarFallback extends StatelessWidget {
-  const _MonthlyCalendarFallback({required this.url});
+  const _MonthlyCalendarFallback({required this.url, this.onTap});
 
   final String url;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       height: double.infinity, // Fill all available space
-      child: Image.network(
-        url,
-        fit: BoxFit.cover, // Changed to cover for full screen effect
-        width: double.infinity,
-        height: double.infinity,
-        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
-          if (progress == null) {
-            return child;
-          }
-          return const Center(child: CircularProgressIndicator());
-        },
-        errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-          return Container(
-            color: Colors.transparent, // Made transparent for consistency
-            alignment: Alignment.center,
-            child: Text(
-              'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
-              style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF64748B)),
-            ),
-          );
-        },
+      child: GestureDetector(
+        onTap: onTap,
+        child: Image.network(
+          url,
+          fit: BoxFit.contain, // Changed to contain for full vertical visibility
+          width: double.infinity,
+          height: double.infinity,
+          loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
+            if (progress == null) {
+              return child;
+            }
+            return const Center(child: CircularProgressIndicator());
+          },
+          errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+            return Container(
+              color: Colors.transparent, // Made transparent for consistency
+              alignment: Alignment.center,
+              child: Text(
+                'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
+                style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF64748B)),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -4607,18 +4680,18 @@ class _MonthlyHighlights extends StatelessWidget {
           BoxShadow(color: Color(0x140F172A), blurRadius: 18, offset: Offset(0, 10)),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
             'ಪ್ರಮುಖ ಸಂಭ್ರಮಗಳು',
-            style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: const Color(0xFF0F4AA3)),
+            style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF0F4AA3)),
           ),
-          const SizedBox(height: 14),
+          const SizedBox(height: 8),
           Wrap(
-            spacing: 14,
-            runSpacing: 14,
+            spacing: 8,
+            runSpacing: 8,
             children: <Widget>[
               if (festivalDays.isNotEmpty)
                 ...festivalDays.map(
@@ -4674,18 +4747,18 @@ class _HighlightCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 160,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+      width: 120,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(12),
         gradient: LinearGradient(
-          colors: <Color>[accent.withValues(alpha: 0.12), Colors.white],
+          colors: <Color>[accent.withValues(alpha: 0.08), Colors.white],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border.all(color: accent.withValues(alpha: 0.32), width: 1.1),
+        border: Border.all(color: accent.withValues(alpha: 0.24), width: 0.8),
         boxShadow: <BoxShadow>[
-          BoxShadow(color: accent.withValues(alpha: 0.18), blurRadius: 14, offset: const Offset(0, 6)),
+          BoxShadow(color: accent.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -4693,14 +4766,14 @@ class _HighlightCard extends StatelessWidget {
         children: <Widget>[
           Text(
             title,
-            maxLines: 2,
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w800, color: _darken(accent, 0.15)),
+            style: GoogleFonts.notoSansKannada(fontSize: 11, fontWeight: FontWeight.w700, color: _darken(accent, 0.15)),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
             subtitle,
-            style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: accent.withValues(alpha: 0.8)),
+            style: GoogleFonts.notoSansKannada(fontSize: 9, fontWeight: FontWeight.w500, color: accent.withValues(alpha: 0.7)),
           ),
         ],
       ),
