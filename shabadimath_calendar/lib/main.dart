@@ -11,6 +11,7 @@ import 'providers/app_state.dart' as calendar_app_state;
 import 'providers/reminder_provider.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/monthly_calendar_screen.dart';
 import 'theme/app_theme.dart';
 
 import 'services/reminder_scheduler.dart';
@@ -71,6 +72,7 @@ class ShabadimathCalendarApp extends StatelessWidget {
             home: const HomeScreen(),
             routes: <String, WidgetBuilder>{
               CalendarScreen.routeName: (_) => const CalendarScreen(),
+              MonthlyCalendarScreen.routeName: (_) => const MonthlyCalendarScreen(),
             },
           );
         },

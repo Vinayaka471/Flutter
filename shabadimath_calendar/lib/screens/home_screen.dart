@@ -2915,10 +2915,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     super.initState();
     final AppState state = Provider.of<AppState>(context, listen: false);
     final DateTime selectedDay = state.selectedDay;
-    _months = PanchangaDataUtils.monthsForYear(selectedDay.year);
+    _months = _generateMonthsForMultipleYears(selectedDay.year);
     _dailyMonth = DateTime(selectedDay.year, selectedDay.month, 1);
     _monthlyMonth = DateTime(selectedDay.year, selectedDay.month, 1);
-    _tabController = TabController(length: _months.length, vsync: this, initialIndex: _monthlyMonth.month - 1);
+    _tabController = TabController(length: _months.length, vsync: this, initialIndex: _calculateInitialTabIndex(selectedDay));
     _tabController.addListener(_handleTabChange);
     _pageController = PageController(initialPage: _section.index);
     _headerDateTime = DateTime.now();
@@ -2928,6 +2928,34 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         _headerDateTime = DateTime.now();
       });
     });
+  }
+
+  static List<DateTime> _generateMonthsForMultipleYears(int centerYear) {
+    // Generate months for 3 years: centerYear-1, centerYear, centerYear+1
+    // This gives us 36 months total (12 months × 3 years)
+    final List<DateTime> months = <DateTime>[];
+
+    for (int year = centerYear - 1; year <= centerYear + 1; year++) {
+      for (int month = 1; month <= 12; month++) {
+        months.add(DateTime(year, month, 1));
+      }
+    }
+
+    return months;
+  }
+
+  int _calculateInitialTabIndex(DateTime selectedDay) {
+    // Calculate the correct tab index for the selected month in the multi-year list
+    // The list is organized as: [year-1 months] + [current year months] + [year+1 months]
+    final int centerYear = selectedDay.year;
+    final int targetYear = selectedDay.year;
+    final int targetMonth = selectedDay.month;
+
+    // Calculate offset: (targetYear - (centerYear - 1)) * 12 + (targetMonth - 1)
+    final int yearOffset = (targetYear - (centerYear - 1)) * 12;
+    final int monthOffset = targetMonth - 1;
+
+    return yearOffset + monthOffset;
   }
 
   void _handleTabChange() {
@@ -3916,24 +3944,42 @@ class _MonthlyContentState extends State<_MonthlyContent> {
     final ThemeData theme = Theme.of(context);
     final List<PanchangaDay> days = PanchangaDataUtils.daysForMonth(widget.month);
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 28),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          _MonthlyCalendarImage(month: widget.month),
-          const SizedBox(height: 20),
+          Text(
+            PanchangaDataUtils.kannadaMonthLabel(widget.month),
+            style: GoogleFonts.notoSansKannada(fontSize: 20, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            '${widget.month.year}',
+            style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
+          ),
+          const SizedBox(height: 4),
+          Expanded(
+            flex: 1000 // Maximum size - calendar covers entire screen
+            child: _MonthlyCalendarImage(month: widget.month),
+          ),
+          const SizedBox(height: 8),
+          _MonthlyHighlights(
+            month: widget.month,
+            days: days,
+          ),
+          const SizedBox(height: 8),
           Row(
             children: <Widget>[
               Expanded(
                 child: _MonthlyActionButton(
-                  label: 'ರಾಶಿ ಭವಿಷ್ಯ',
+                  label: 'ರಾಶಿ',
                   icon: Icons.auto_awesome_rounded,
                   onPressed: _openRashiPage,
                   theme: theme,
                 ),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 6),
               Expanded(
                 child: _MonthlyActionButton(
                   label: 'ಪಂಚಾಂಗ',
@@ -3944,12 +3990,6 @@ class _MonthlyContentState extends State<_MonthlyContent> {
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          _MonthlyFestivalsSection(
-            month: widget.month,
-            days: days,
-          ),
-          const SizedBox(height: 48),
         ],
       ),
     );
@@ -3965,36 +4005,31 @@ class _MonthlyCalendarImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final String? assetPath = PanchangaDataUtils.monthImageAsset(month);
-    final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/panchanga/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
+    // Changed from panchanga URL to monthly calendar URL
+    final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/monthly/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
 
-    Widget image;
-    if (assetPath != null) {
-      image = Image.asset(
-        assetPath,
-        fit: BoxFit.cover,
-        alignment: Alignment.topCenter,
-        errorBuilder: (_, __, ___) => _MonthlyCalendarFallback(url: networkUrl),
-      );
-    } else {
-      image = _MonthlyCalendarFallback(url: networkUrl);
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: <Widget>[
-        Text(
-          '${PanchangaDataUtils.kannadaMonthLabel(month)} ${month.year}',
-          style: GoogleFonts.notoSansKannada(fontSize: 20, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFE2E8F0),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE0E7FF), width: 1.2),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: SizedBox(
+          width: double.infinity,
+          height: double.infinity, // Take all available space
+          child: assetPath != null
+            ? Image.asset(
+                assetPath,
+                fit: BoxFit.contain,
+                width: double.infinity,
+                height: double.infinity,
+                errorBuilder: (_, __, ___) => _MonthlyCalendarFallback(url: networkUrl),
+              )
+            : _MonthlyCalendarFallback(url: networkUrl),
         ),
-        const SizedBox(height: 12),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(24),
-          child: AspectRatio(
-            aspectRatio: 3 / 4,
-            child: image,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }
@@ -4006,26 +4041,31 @@ class _MonthlyCalendarFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Image.network(
-      url,
-      fit: BoxFit.cover,
-      alignment: Alignment.topCenter,
-      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
-        if (progress == null) {
-          return child;
-        }
-        return const Center(child: CircularProgressIndicator());
-      },
-      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-        return Container(
-          color: const Color(0xFFE2E8F0),
-          alignment: Alignment.center,
-          child: Text(
-            'ಮಾಸಿಕ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
-            style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF64748B)),
-          ),
-        );
-      },
+    return SizedBox(
+      width: double.infinity,
+      height: double.infinity, // Fill all available space
+      child: Image.network(
+        url,
+        fit: BoxFit.contain, // Changed back to contain to show full image
+        width: double.infinity,
+        height: double.infinity,
+        loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
+          if (progress == null) {
+            return child;
+          }
+          return const Center(child: CircularProgressIndicator());
+        },
+        errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+          return Container(
+            color: const Color(0xFFE2E8F0),
+            alignment: Alignment.center,
+            child: Text(
+              'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
+              style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF64748B)),
+            ),
+          );
+        },
+      ),
     );
   }
 }
