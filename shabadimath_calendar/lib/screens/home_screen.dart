@@ -3940,7 +3940,8 @@ class _MonthlyContentState extends State<_MonthlyContent> {
   }
 
   void _openZoomableCalendar(BuildContext context, DateTime month) {
-    final String? assetPath = PanchangaDataUtils.monthImageAsset(month);
+    // Skip asset loading since monthly calendar assets don't exist
+    // Use network URL directly
     final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/monthly/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
 
     Navigator.of(context).push(
@@ -3966,33 +3967,28 @@ class _MonthlyContentState extends State<_MonthlyContent> {
               minScale: 0.5,
               maxScale: 5.0,
               child: Center(
-                child: assetPath != null
-                  ? Image.asset(
-                      assetPath,
-                      fit: BoxFit.contain,
-                    )
-                  : Image.network(
-                      networkUrl,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
-                        if (progress == null) {
-                          return child;
-                        }
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        );
-                      },
-                      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                        return const Center(
-                          child: Text(
-                            'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                        );
-                      },
-                    ),
+                child: Image.network(
+                  networkUrl,
+                  fit: BoxFit.contain,
+                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
+                    if (progress == null) {
+                      return child;
+                    }
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    );
+                  },
+                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                    return const Center(
+                      child: Text(
+                        'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -4070,8 +4066,8 @@ class _MonthlyCalendarImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    final String? assetPath = PanchangaDataUtils.monthImageAsset(month);
-    // Changed from panchanga URL to monthly calendar URL
+    // Skip asset loading since monthly calendar assets don't exist
+    // Use network URL directly
     final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/monthly/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
 
     return Container(
@@ -4087,15 +4083,7 @@ class _MonthlyCalendarImage extends StatelessWidget {
           height: double.infinity, // Take all available space
           child: GestureDetector(
             onTap: onTap,
-            child: assetPath != null
-              ? Image.asset(
-                  assetPath,
-                  fit: BoxFit.contain, // Changed to contain for full vertical visibility
-                  width: double.infinity,
-                  height: double.infinity,
-                  errorBuilder: (_, __, ___) => _MonthlyCalendarFallback(url: networkUrl, onTap: onTap),
-                )
-              : _MonthlyCalendarFallback(url: networkUrl, onTap: onTap),
+            child: _MonthlyCalendarFallback(url: networkUrl, onTap: onTap),
           ),
         ),
       ),
