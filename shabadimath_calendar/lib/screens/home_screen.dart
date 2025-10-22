@@ -154,7 +154,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                   width: 64,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurface.withValues(alpha: 0.12),
+                    color: Colors.white.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
@@ -194,7 +194,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                             style: GoogleFonts.notoSansKannada(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -204,7 +204,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                               style: GoogleFonts.notoSansKannada(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: theme.colorScheme.onSurface,
+                                color: Colors.white,
                               ),
                             ),
                           ),
@@ -218,7 +218,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                             style: GoogleFonts.notoSansKannada(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -253,7 +253,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                                       style: GoogleFonts.notoSansKannada(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w700,
-                                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                        color: Colors.white.withValues(alpha: 0.7),
                                       ),
                                     ),
                                   ),
@@ -269,7 +269,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                             style: GoogleFonts.notoSansKannada(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                              color: Colors.white.withValues(alpha: 0.8),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -291,7 +291,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                   Expanded(
                     child: Text(
                       widget.formattedDateLabel,
-                      style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w700),
+                      style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w700, color: Colors.white),
                     ),
                   ),
                   if (selectedPalette != null)
@@ -339,16 +339,16 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                 ...widget.events.map(
                   (String festival) => Padding(
                     padding: const EdgeInsets.only(bottom: 6),
-                    child: Text('• $festival', style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w600)),
+                    child: Text('• $festival', style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white)),
                   ),
                 ),
               ],
               const SizedBox(height: 20),
-              Text('ದಿನದ ಶಬ್ದ', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+              Text('ದಿನದ ಶಬ್ದ', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, color: Colors.white)),
               const SizedBox(height: 6),
-              Text(widget.shabadTitle, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
+              Text(widget.shabadTitle, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600, color: Colors.white)),
               const SizedBox(height: 6),
-              Text(widget.shabadGurmukhi, style: theme.textTheme.bodyMedium?.copyWith(height: 1.4)),
+              Text(widget.shabadGurmukhi, style: theme.textTheme.bodyMedium?.copyWith(height: 1.4, color: Colors.white)),
               const SizedBox(height: 22),
               Text(
                 'ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ',
@@ -361,18 +361,18 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                 textInputAction: TextInputAction.newline,
                 decoration: InputDecoration(
                   hintText: 'ನಿಮ್ಮ ಟಿಪ್ಪಣಿಯನ್ನು ಇಲ್ಲಿ ಬರೆಯಿರಿ...',
-                  hintStyle: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w500),
+                  hintStyle: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.white.withValues(alpha: 0.6)),
                   filled: true,
-                  fillColor: theme.colorScheme.surfaceVariant.withValues(alpha: 0.6),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: theme.colorScheme.primary.withValues(alpha: 0.15))),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: theme.colorScheme.primary, width: 1.4)),
+                  fillColor: Colors.white.withValues(alpha: 0.1),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3))),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(18), borderSide: BorderSide(color: Colors.white, width: 1.4)),
                 ),
-                style: GoogleFonts.notoSansKannada(fontSize: 14.5, fontWeight: FontWeight.w600),
+                style: GoogleFonts.notoSansKannada(fontSize: 14.5, fontWeight: FontWeight.w600, color: Colors.white),
               ),
               const SizedBox(height: 18),
               Text(
                 'ಬಣ್ಣದಿಂದ ಹೈಲೈಟ್ ಮಾಡಿ',
-                style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700),
+                style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
               ),
               const SizedBox(height: 10),
               Wrap(
@@ -412,7 +412,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
               const SizedBox(height: 18),
               Text(
                 'ಇಮೋಜಿ ಆಯ್ಕೆಮಾಡಿ',
-                style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700),
+                style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
               ),
               const SizedBox(height: 10),
               Wrap(
@@ -432,9 +432,9 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                         }
                       });
                     },
-                    selectedColor: theme.colorScheme.primary.withValues(alpha: 0.15),
+                    selectedColor: Colors.white.withValues(alpha: 0.2),
                     showCheckmark: false,
-                    backgroundColor: theme.colorScheme.surfaceVariant.withValues(alpha: 0.45),
+                    backgroundColor: Colors.white.withValues(alpha: 0.1),
                   );
                 }).toList(),
               ),
@@ -447,12 +447,12 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                         Navigator.of(context).pop(_AnnotationResult.clear());
                       },
                       icon: const Icon(Icons.delete_outline_rounded),
-                      label: Text('ಅಳಿಸಿ', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w700)),
+                      label: Text('ಅಳಿಸಿ', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w700, color: Colors.white)),
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                        side: BorderSide(color: theme.colorScheme.error.withValues(alpha: 0.6), width: 1.2),
-                        foregroundColor: theme.colorScheme.error,
+                        side: BorderSide(color: Colors.white.withValues(alpha: 0.5), width: 1.2),
+                        foregroundColor: Colors.white,
                       ),
                     ),
                   ),
@@ -468,7 +468,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                         Navigator.of(context).pop(_AnnotationResult.save(annotation));
                       },
                       icon: const Icon(Icons.save_rounded),
-                      label: Text('ಸಂಗ್ರಹಿಸಿ', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w800)),
+                      label: Text('ಸಂಗ್ರಹಿಸಿ', style: GoogleFonts.notoSansKannada(fontWeight: FontWeight.w800, color: Colors.white)),
                       style: FilledButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -3446,7 +3446,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     final _AnnotationResult? result = await showModalBottomSheet<_AnnotationResult>(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.black,
       isScrollControlled: true,
       builder: (BuildContext context) {
         return _DayAnnotationSheet(
@@ -3500,7 +3500,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               style: GoogleFonts.notoSansKannada(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.85),
+                color: Colors.white.withValues(alpha: 0.9),
                 height: 1.4,
               ),
             ),
@@ -3940,8 +3940,7 @@ class _MonthlyContentState extends State<_MonthlyContent> {
   }
 
   void _openZoomableCalendar(BuildContext context, DateTime month) {
-    // Skip asset loading since monthly calendar assets don't exist
-    // Use network URL directly
+    final String? assetPath = PanchangaDataUtils.monthImageAsset(month);
     final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/monthly/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
 
     Navigator.of(context).push(
@@ -3967,28 +3966,33 @@ class _MonthlyContentState extends State<_MonthlyContent> {
               minScale: 0.5,
               maxScale: 5.0,
               child: Center(
-                child: Image.network(
-                  networkUrl,
-                  fit: BoxFit.contain,
-                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
-                    if (progress == null) {
-                      return child;
-                    }
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                      ),
-                    );
-                  },
-                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                    return const Center(
-                      child: Text(
-                        'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    );
-                  },
-                ),
+                child: assetPath != null
+                  ? Image.asset(
+                      assetPath,
+                      fit: BoxFit.contain,
+                    )
+                  : Image.network(
+                      networkUrl,
+                      fit: BoxFit.contain,
+                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
+                        if (progress == null) {
+                          return child;
+                        }
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        );
+                      },
+                      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                        return const Center(
+                          child: Text(
+                            'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        );
+                      },
+                    ),
               ),
             ),
           ),
