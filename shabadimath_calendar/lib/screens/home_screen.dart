@@ -108,6 +108,8 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
   late final TextEditingController _noteController;
   String? _selectedColorKey;
   late Set<String> _selectedEmojis;
+  bool _showColorPalette = false;
+  bool _showEmojiSelection = false;
 
   @override
   void initState() {
@@ -332,7 +334,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                   style: GoogleFonts.notoSansKannada(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
-                    color: theme.colorScheme.secondary,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -352,7 +354,7 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
               const SizedBox(height: 22),
               Text(
                 'ಟಿಪ್ಪಣಿ ಸೇರಿಸಿ',
-                style: GoogleFonts.notoSansKannada(fontSize: 16, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                style: GoogleFonts.notoSansKannada(fontSize: 16, fontWeight: FontWeight.w800, color: Colors.white),
               ),
               const SizedBox(height: 8),
               TextField(
@@ -370,74 +372,122 @@ class _DayAnnotationSheetState extends State<_DayAnnotationSheet> {
                 style: GoogleFonts.notoSansKannada(fontSize: 14.5, fontWeight: FontWeight.w600, color: Colors.white),
               ),
               const SizedBox(height: 18),
-              Text(
-                'ಬಣ್ಣದಿಂದ ಹೈಲೈಟ್ ಮಾಡಿ',
-                style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: _noteHighlightPalettes.entries.map((MapEntry<String, _NoteHighlightPalette> entry) {
-                  final bool isSelected = entry.key == _selectedColorKey;
-                  final List<Color> gradientColors = isSelected
-                      ? <Color>[entry.value.accent.withValues(alpha: 0.92), entry.value.accent]
-                      : <Color>[entry.value.background, entry.value.accent.withValues(alpha: 0.75)];
-                  return ChoiceChip(
-                    label: Container(
-                      width: 36,
-                      height: 18,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(9),
-                        gradient: LinearGradient(
-                          colors: gradientColors,
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _showColorPalette = !_showColorPalette;
+                          _showEmojiSelection = false; // Close emoji when opening color
+                        });
+                      },
+                      icon: const Icon(Icons.palette_rounded, color: Colors.white),
+                      label: Text('ಬಣ್ಣ', style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white.withValues(alpha: 0.15),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                        elevation: 0,
                       ),
                     ),
-                    selected: isSelected,
-                    onSelected: (bool value) {
-                      setState(() {
-                        _selectedColorKey = value ? entry.key : null;
-                      });
-                    },
-                    selectedColor: entry.value.accent.withValues(alpha: 0.22),
-                    backgroundColor: entry.value.background.withValues(alpha: 0.3),
-                    side: BorderSide(color: entry.value.accent.withValues(alpha: isSelected ? 0.9 : 0.4), width: isSelected ? 1.6 : 1),
-                    labelStyle: GoogleFonts.notoSansKannada(color: entry.value.accent, fontWeight: FontWeight.w800),
-                  );
-                }).toList(),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        setState(() {
+                          _showEmojiSelection = !_showEmojiSelection;
+                          _showColorPalette = false; // Close color when opening emoji
+                        });
+                      },
+                      icon: const Icon(Icons.emoji_emotions_rounded, color: Colors.white),
+                      label: Text('ಇಮೋಜಿ', style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white.withValues(alpha: 0.15),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 18),
-              Text(
-                'ಇಮೋಜಿ ಆಯ್ಕೆಮಾಡಿ',
-                style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
-              ),
-              const SizedBox(height: 10),
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: _annotationEmojis.map((String emoji) {
-                  final bool isSelected = _selectedEmojis.contains(emoji);
-                  return FilterChip(
-                    label: Text(emoji, style: const TextStyle(fontSize: 18)),
-                    selected: isSelected,
-                    onSelected: (bool value) {
-                      setState(() {
-                        if (value) {
-                          _selectedEmojis.add(emoji);
-                        } else {
-                          _selectedEmojis.remove(emoji);
-                        }
-                      });
-                    },
-                    selectedColor: Colors.white.withValues(alpha: 0.2),
-                    showCheckmark: false,
-                    backgroundColor: Colors.white.withValues(alpha: 0.1),
-                  );
-                }).toList(),
-              ),
+              if (_showColorPalette) ...<Widget>[
+                const SizedBox(height: 18),
+                Text(
+                  'ಬಣ್ಣದಿಂದ ಹೈಲೈಟ್ ಮಾಡಿ',
+                  style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: _noteHighlightPalettes.entries.map((MapEntry<String, _NoteHighlightPalette> entry) {
+                    final bool isSelected = entry.key == _selectedColorKey;
+                    final List<Color> gradientColors = isSelected
+                        ? <Color>[entry.value.accent.withValues(alpha: 0.92), entry.value.accent]
+                        : <Color>[entry.value.background, entry.value.accent.withValues(alpha: 0.75)];
+                    return ChoiceChip(
+                      label: Container(
+                        width: 36,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(9),
+                          gradient: LinearGradient(
+                            colors: gradientColors,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                      ),
+                      selected: isSelected,
+                      onSelected: (bool value) {
+                        setState(() {
+                          _selectedColorKey = value ? entry.key : null;
+                        });
+                      },
+                      selectedColor: entry.value.accent.withValues(alpha: 0.22),
+                      backgroundColor: entry.value.background.withValues(alpha: 0.3),
+                      side: BorderSide(color: entry.value.accent.withValues(alpha: isSelected ? 0.9 : 0.4), width: isSelected ? 1.6 : 1),
+                      labelStyle: GoogleFonts.notoSansKannada(color: entry.value.accent, fontWeight: FontWeight.w800),
+                    );
+                  }).toList(),
+                ),
+              ],
+              if (_showEmojiSelection) ...<Widget>[
+                const SizedBox(height: 18),
+                Text(
+                  'ಇಮೋಜಿ ಆಯ್ಕೆಮಾಡಿ',
+                  style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: _annotationEmojis.map((String emoji) {
+                    final bool isSelected = _selectedEmojis.contains(emoji);
+                    return FilterChip(
+                      label: Text(emoji, style: const TextStyle(fontSize: 18)),
+                      selected: isSelected,
+                      onSelected: (bool value) {
+                        setState(() {
+                          if (value) {
+                            _selectedEmojis.add(emoji);
+                          } else {
+                            _selectedEmojis.remove(emoji);
+                          }
+                        });
+                      },
+                      selectedColor: Colors.white.withValues(alpha: 0.2),
+                      showCheckmark: false,
+                      backgroundColor: Colors.white.withValues(alpha: 0.1),
+                    );
+                  }).toList(),
+                ),
+              ],
               const SizedBox(height: 26),
               Row(
                 children: <Widget>[
