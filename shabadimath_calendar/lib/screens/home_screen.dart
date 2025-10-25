@@ -82,6 +82,75 @@ class _MonthlyActionButton extends StatelessWidget {
   }
 }
 
+class _PanchangaYearButton extends StatelessWidget {
+  const _PanchangaYearButton({
+    required this.year,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final int year;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: isSelected
+                ? <Color>[const Color(0xFF0F4AA3), const Color(0xFF1E88E5)]
+                : <Color>[Colors.white, const Color(0xFFF8FAFC)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF0F4AA3) : const Color(0xFFE2E8F0),
+            width: isSelected ? 2 : 1.2,
+          ),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: const Color(0xFF0F4AA3).withValues(alpha: isSelected ? 0.3 : 0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              label,
+              style: GoogleFonts.notoSansKannada(
+                fontSize: 20,
+                fontWeight: FontWeight.w800,
+                color: isSelected ? Colors.white : const Color(0xFF0F4AA3),
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'ಪಂಚಾಂಗ',
+              style: GoogleFonts.notoSansKannada(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: isSelected
+                    ? Colors.white.withValues(alpha: 0.9)
+                    : const Color(0xFF0F4AA3).withValues(alpha: 0.7),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _DayAnnotationSheet extends StatefulWidget {
   const _DayAnnotationSheet({
     required this.formattedDateLabel,
@@ -3251,7 +3320,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     final Widget monthlyContent = _MonthlyContent(
       month: _monthlyMonth,
-      onShowPanchanga: _openWebPanchanga,
+      onShowPanchanga: () => _showPanchangaYearSelection(),
     );
     final Widget mantraContent = const _MantraTabContent();
     final Widget festivalsContent = _FestivalsContent(
@@ -3412,6 +3481,85 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     if (annotation != null) {
       appState.saveAnnotation(date, annotation);
     }
+  }
+
+  void _showPanchangaYearSelection() {
+    showModalBottomSheet<int>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Center(
+                child: Container(
+                  width: 64,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0F4AA3).withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'ಪಂಚಾಂಗ ವರ್ಷವನ್ನು ಆಯ್ಕೆಮಾಡಿ',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.notoSansKannada(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: const Color(0xFF0F4AA3),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: _PanchangaYearButton(
+                      year: 2025,
+                      label: '2025',
+                      isSelected: false,
+                      onTap: () => Navigator.of(context).pop(2025),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: _PanchangaYearButton(
+                      year: 2026,
+                      label: '2026',
+                      isSelected: false,
+                      onTap: () => Navigator.of(context).pop(2026),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
+    ).then((int? selectedYear) {
+      if (selectedYear != null) {
+        _openPanchangaPage(selectedYear);
+      }
+    });
+  }
+
+  void _openPanchangaPage(int year) {
+    InterstitialAdManager.instance.showAd(onAdDismissed: () {
+      if (!mounted) {
+        return;
+      }
+      Navigator.of(context).push(_MonthlySlidePageRoute(
+        builder: (BuildContext context) => PanchangaImageScreen(month: _monthlyMonth.month, year: year),
+      ));
+    });
   }
 
   static Widget _detailRow(ThemeData theme, String label, String value) {
@@ -4023,17 +4171,6 @@ class _MonthlyContentState extends State<_MonthlyContent> {
     });
   }
 
-  void _openPanchangaPage() {
-    InterstitialAdManager.instance.showAd(onAdDismissed: () {
-      if (!mounted) {
-        return;
-      }
-      Navigator.of(context).push(_MonthlySlidePageRoute(
-        builder: (BuildContext context) => PanchangaImageScreen(month: widget.month.month, year: widget.month.year),
-      ));
-    });
-  }
-
   void _openZoomableCalendar(BuildContext context, DateTime month) {
     final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/monthly/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
 
@@ -4144,7 +4281,7 @@ class _MonthlyContentState extends State<_MonthlyContent> {
                 child: _MonthlyActionButton(
                   label: 'ಪಂಚಾಂಗ',
                   icon: Icons.menu_book_rounded,
-                  onPressed: _openPanchangaPage,
+                  onPressed: widget.onShowPanchanga,
                   theme: theme,
                 ),
               ),
