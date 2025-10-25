@@ -3990,7 +3990,6 @@ class _MonthlyContentState extends State<_MonthlyContent> {
   }
 
   void _openZoomableCalendar(BuildContext context, DateTime month) {
-    final String? assetPath = PanchangaDataUtils.monthImageAsset(month);
     final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/monthly/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
 
     Navigator.of(context).push(
@@ -4016,33 +4015,34 @@ class _MonthlyContentState extends State<_MonthlyContent> {
               minScale: 0.5,
               maxScale: 5.0,
               child: Center(
-                child: assetPath != null
-                  ? Image.asset(
-                      assetPath,
-                      fit: BoxFit.contain,
-                    )
-                  : Image.network(
-                      networkUrl,
-                      fit: BoxFit.contain,
-                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
-                        if (progress == null) {
-                          return child;
-                        }
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                          ),
-                        );
-                      },
-                      errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                        return const Center(
-                          child: Text(
-                            'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                        );
-                      },
-                    ),
+                child: Image.network(
+                  networkUrl,
+                  fit: BoxFit.contain,
+                  width: double.infinity,
+                  height: double.infinity,
+                  loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
+                    if (progress == null) {
+                      return child;
+                    }
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    );
+                  },
+                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                    return Container(
+                      color: Colors.black,
+                      child: const Center(
+                        child: Text(
+                          'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ\nಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವನ್ನು ಪರಿಶೀಲಿಸಿ',
+                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
@@ -4120,8 +4120,7 @@ class _MonthlyCalendarImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    // Skip asset loading since monthly calendar assets don't exist
-    // Use network URL directly
+    // Load monthly calendar image from network URL
     final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/monthly/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
 
     return Container(
@@ -4174,8 +4173,9 @@ class _MonthlyCalendarFallback extends StatelessWidget {
               color: Colors.transparent, // Made transparent for consistency
               alignment: Alignment.center,
               child: Text(
-                'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್ ಚಿತ್ರ ಲೋಡ್ ಆಗಲಿಲ್ಲ',
+                'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್\nಲಭ್ಯವಿಲ್ಲ',
                 style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF64748B)),
+                textAlign: TextAlign.center,
               ),
             );
           },
