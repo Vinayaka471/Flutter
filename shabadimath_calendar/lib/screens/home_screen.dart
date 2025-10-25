@@ -16,7 +16,6 @@ import '../providers/reminder_provider.dart';
 import '../utils/data_utils.dart';
 import '../widgets/glass_card.dart';
 import '../widgets/gradient_background.dart';
-import 'mantra_screen.dart';
 import 'panchanga_image_screen.dart';
 import 'rashi_bhavishya_screen.dart';
 import '../services/ad_service.dart';
@@ -667,80 +666,6 @@ const List<String> _annotationEmojis = <String>[
   '💼',
 ];
 
-class _MonthlyFestivalsSection extends StatelessWidget {
-  const _MonthlyFestivalsSection({required this.month, required this.days});
-
-  final DateTime month;
-  final List<PanchangaDay> days;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final String monthLabel = PanchangaDataUtils.kannadaMonthLabel(month);
-    final Map<String, List<DateTime>> groupedFestivals = <String, List<DateTime>>{};
-
-    for (final PanchangaDay day in days) {
-      for (final String rawFestival in day.festivals) {
-        final String festival = rawFestival.trim();
-        if (festival.isEmpty) {
-          continue;
-        }
-        groupedFestivals.putIfAbsent(festival, () => <DateTime>[]).add(day.date);
-      }
-    }
-
-    final List<_FestivalStaticEntry> curated = _curatedMonthlyFestivals2026[month.month] ?? <_FestivalStaticEntry>[];
-    for (final _FestivalStaticEntry entry in curated) {
-      groupedFestivals.putIfAbsent(entry.name, () => <DateTime>[]).add(entry.date);
-    }
-
-    final List<_MonthlyFestivalEntry> entries = groupedFestivals.entries
-        .map(
-          (MapEntry<String, List<DateTime>> entry) => _MonthlyFestivalEntry(
-            name: entry.key,
-            dates: (entry.value..sort()).map((DateTime d) => DateTime(d.year, d.month, d.day)).toList(),
-          ),
-        )
-        .toList()
-      ..sort((_MonthlyFestivalEntry a, _MonthlyFestivalEntry b) => a.dates.first.compareTo(b.dates.first));
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.12), width: 1.1),
-        boxShadow: const <BoxShadow>[
-          BoxShadow(color: Color(0x140F172A), blurRadius: 18, offset: Offset(0, 10)),
-        ],
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 22, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Text(
-            'ಪ್ರಮುಖ ಸಂಭ್ರಮಗಳು • $monthLabel',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.notoSansKannada(fontSize: 19, fontWeight: FontWeight.w900, color: theme.colorScheme.primary),
-          ),
-          const SizedBox(height: 10),
-          if (entries.isEmpty)
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 28),
-              alignment: Alignment.center,
-              child: Text(
-                'ಈ ತಿಂಗಳಿಗೆ ವಿಶೇಷ ಸಂಭ್ರಮಗಳು ಲಭ್ಯವಿಲ್ಲ. ದಯವಿಟ್ಟು ನಂತರ ಪರಿಶೀಲಿಸಿ.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.65)),
-              ),
-            )
-          else
-            _MonthlyFestivalList(entries: entries),
-        ],
-      ),
-    );
-  }
-}
-
 class _MonthlyFestivalList extends StatelessWidget {
   const _MonthlyFestivalList({required this.entries});
 
@@ -820,46 +745,6 @@ class _MonthlyFestivalEntry {
 
   final String name;
   final List<DateTime> dates;
-}
-
-class _MonthlyRashiSection extends StatelessWidget {
-  const _MonthlyRashiSection({super.key, required this.month});
-
-  final DateTime month;
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final String monthLabel = PanchangaDataUtils.kannadaMonthLabel(month);
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.12), width: 1.1),
-        boxShadow: const <BoxShadow>[
-          BoxShadow(color: Color(0x140F172A), blurRadius: 20, offset: Offset(0, 12)),
-        ],
-      ),
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: <Widget>[
-          Text(
-            'ರಾಶಿ ಭವಿಷ್ಯ • $monthLabel',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.notoSansKannada(fontSize: 19, fontWeight: FontWeight.w900, color: theme.colorScheme.primary),
-          ),
-          const SizedBox(height: 16),
-          RashiBhavishyaPanel(
-            scrollable: false,
-            padding: EdgeInsets.zero,
-            initialMonth: monthLabel,
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class _MonthlyPanchangaSection extends StatefulWidget {
@@ -3564,33 +3449,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 }
 
-class _CalendarNavIcon extends StatelessWidget {
-  const _CalendarNavIcon({required this.icon, required this.onTap, required this.background});
-
-  final IconData icon;
-  final VoidCallback onTap;
-  final Color background;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 36,
-        height: 36,
-        decoration: BoxDecoration(
-          color: background,
-          shape: BoxShape.circle,
-          boxShadow: <BoxShadow>[
-            BoxShadow(color: background.withValues(alpha: 0.35), blurRadius: 10, offset: const Offset(0, 4)),
-          ],
-        ),
-        child: Icon(icon, color: Colors.white, size: 22),
-      ),
-    );
-  }
-}
-
 class _TopBar extends StatelessWidget {
   const _TopBar({required this.year, required this.onMenuTap});
 
@@ -3631,14 +3489,51 @@ class _TopBar extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text(
-                    'ಕನ್ನಡ ಕ್ಯಾಲೆಂಡರ್',
-                    style: GoogleFonts.notoSansKannada(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Sanātana Panchanga • $year',
-                    style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.85)),
+                  Row(
+                    children: <Widget>[
+                      // App Logo
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withValues(alpha: 0.2),
+                          border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
+                        ),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/icons/app_logo.png', // Update this path to your logo
+                            fit: BoxFit.cover,
+                            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                              return Icon(
+                                Icons.calendar_today_rounded,
+                                color: Colors.white.withValues(alpha: 0.8),
+                                size: 20,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // App Title
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              'ಕನ್ನಡ ಕ್ಯಾಲೆಂಡರ್',
+                              style: GoogleFonts.notoSansKannada(fontSize: 20, fontWeight: FontWeight.w800, color: Colors.white),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Sanātana Panchanga • $year',
+                              style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.85)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -3678,6 +3573,61 @@ class _HomeDrawer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
+            // Drawer Header with Logo
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: <Color>[Color(0xFF0F4AA3), Color(0xFF1E88E5)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: <Widget>[
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.2),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 2),
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/icons/app_logo.png', // Update this path to your logo
+                        fit: BoxFit.cover,
+                        errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                          return Icon(
+                            Icons.calendar_today_rounded,
+                            color: Colors.white.withValues(alpha: 0.9),
+                            size: 28,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          'ಕನ್ನಡ ಕ್ಯಾಲೆಂಡರ್',
+                          style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
+                        ),
+                        Text(
+                          'Sanātana Panchanga',
+                          style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.8)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -3751,7 +3701,36 @@ class HomeMenuPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ಮೆನು'),
+        title: Row(
+          children: <Widget>[
+            Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.2),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
+              ),
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/icons/app_logo.png', // Update this path to your logo
+                  fit: BoxFit.cover,
+                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                    return Icon(
+                      Icons.menu_rounded,
+                      color: Colors.white.withValues(alpha: 0.8),
+                      size: 20,
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text('ಮೆನು'),
+          ],
+        ),
+        backgroundColor: const Color(0xFF1E3A8A),
+        foregroundColor: Colors.white,
       ),
       body: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
@@ -3783,6 +3762,69 @@ class _HomeMenuOption {
   final String label;
   final _HomeSection section;
   final IconData icon;
+}
+
+class LogoSplashScreen extends StatelessWidget {
+  const LogoSplashScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color(0xFF0F4AA3),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            // Main App Logo
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.1),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 3),
+                boxShadow: const <BoxShadow>[
+                  BoxShadow(color: Color(0x33000000), blurRadius: 20, offset: Offset(0, 10)),
+                ],
+              ),
+              child: ClipOval(
+                child: Image.asset(
+                  'assets/icons/app_logo.png', // Update this path to your logo
+                  fit: BoxFit.cover,
+                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                    return Icon(
+                      Icons.calendar_today_rounded,
+                      color: Colors.white.withValues(alpha: 0.9),
+                      size: 60,
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'ಕನ್ನಡ ಕ್ಯಾಲೆಂಡರ್',
+              style: GoogleFonts.notoSansKannada(fontSize: 28, fontWeight: FontWeight.w800, color: Colors.white),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Sanātana Panchanga',
+              style: GoogleFonts.notoSansKannada(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.8)),
+            ),
+            const SizedBox(height: 40),
+            const SizedBox(
+              width: 40,
+              height: 40,
+              child: CircularProgressIndicator(
+                strokeWidth: 3,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _HomeScreenScope extends InheritedWidget {
@@ -4461,6 +4503,41 @@ class _HeroInfoBox extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _CalendarNavIcon extends StatelessWidget {
+  const _CalendarNavIcon({
+    required this.icon,
+    required this.onTap,
+    required this.background,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: background,
+          shape: BoxShape.circle,
+          boxShadow: const <BoxShadow>[
+            BoxShadow(color: Color(0x33000000), blurRadius: 8, offset: Offset(0, 4)),
+          ],
+        ),
+        child: Icon(
+          icon,
+          color: Colors.white,
+          size: 20,
+        ),
       ),
     );
   }
