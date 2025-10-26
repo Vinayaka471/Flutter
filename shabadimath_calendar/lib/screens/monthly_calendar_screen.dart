@@ -59,7 +59,7 @@ class _MonthlyCalendarScreenState extends State<MonthlyCalendarScreen> {
         children: <Widget>[
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 20),
             color: theme.colorScheme.surface,
             child: Text(
               monthYearText,
@@ -71,15 +71,19 @@ class _MonthlyCalendarScreenState extends State<MonthlyCalendarScreen> {
             ),
           ),
           Expanded(
-            child: Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: InteractiveViewer(
-                    minScale: 0.5,
-                    maxScale: 5.0,
+            child: Container(
+              color: Colors.black,
+              child: Stack(
+                children: <Widget>[
+                  InteractiveViewer(
+                    boundaryMargin: const EdgeInsets.all(20),
+                    minScale: 2.5,
+                    maxScale: 20.0,
+                    panEnabled: true,
+                    scaleEnabled: true,
                     child: Image.network(
                       _getImageUrl(),
-                      fit: BoxFit.contain,
+                      fit: BoxFit.fitWidth,
                       loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
                         if (progress == null) {
                           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -139,12 +143,12 @@ class _MonthlyCalendarScreenState extends State<MonthlyCalendarScreen> {
                       },
                     ),
                   ),
-                ),
-                if (_isLoading)
-                  const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-              ],
+                  if (_isLoading)
+                    const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                ],
+              ),
             ),
           ),
         ],

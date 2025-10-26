@@ -3639,31 +3639,7 @@ class _TopBar extends StatelessWidget {
                 children: <Widget>[
                   Row(
                     children: <Widget>[
-                      // App Logo
-                      Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.2),
-                          border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
-                        ),
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/icons/app_logo.png', // Update this path to your logo
-                            fit: BoxFit.cover,
-                            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                              return Icon(
-                                Icons.calendar_today_rounded,
-                                color: Colors.white.withValues(alpha: 0.8),
-                                size: 20,
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      // App Title
+                      // App Title (Logo removed)
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -3675,7 +3651,7 @@ class _TopBar extends StatelessWidget {
                             ),
                             const SizedBox(height: 2),
                             Text(
-                              'Sanātana Panchanga • $year',
+                              'Kannada Calendar • $year',
                               style: GoogleFonts.notoSansKannada(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.85)),
                             ),
                           ],
@@ -3721,61 +3697,32 @@ class _HomeDrawer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            // Drawer Header with Logo
+            // Logo in upper part of hamburger menu - just the logo without circle
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: <Color>[Color(0xFF0F4AA3), Color(0xFF1E88E5)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.2),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 2),
+              margin: const EdgeInsets.only(bottom: 20),
+              child: Image.asset(
+                'assets/icons/dailylogo.jpg',
+                fit: BoxFit.contain,
+                width: 80,
+                height: 80,
+                alignment: Alignment.center,
+                cacheWidth: 160,
+                filterQuality: FilterQuality.high,
+                errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+                  return Container(
+                    width: 80,
+                    height: 80,
+                    color: const Color(0xFF0F4AA3).withValues(alpha: 0.1),
+                    child: Icon(
+                      Icons.calendar_today_rounded,
+                      color: const Color(0xFF0F4AA3),
+                      size: 40,
                     ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/icons/app_logo.png', // Update this path to your logo
-                        fit: BoxFit.cover,
-                        errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                          return Icon(
-                            Icons.calendar_today_rounded,
-                            color: Colors.white.withValues(alpha: 0.9),
-                            size: 28,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'ಕನ್ನಡ ಕ್ಯಾಲೆಂಡರ್',
-                          style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: Colors.white),
-                        ),
-                        Text(
-                          'Sanātana Panchanga',
-                          style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.8)),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -3851,29 +3798,6 @@ class HomeMenuPage extends StatelessWidget {
       appBar: AppBar(
         title: Row(
           children: <Widget>[
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.2),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
-              ),
-              child: ClipOval(
-                child: Image.asset(
-                  'assets/icons/app_logo.png', // Update this path to your logo
-                  fit: BoxFit.cover,
-                  errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
-                    return Icon(
-                      Icons.menu_rounded,
-                      color: Colors.white.withValues(alpha: 0.8),
-                      size: 20,
-                    );
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
             const Text('ಮೆನು'),
           ],
         ),
@@ -3923,9 +3847,9 @@ class LogoSplashScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            // Main App Logo
+            // Main App Logo shows when hamburger is clicked
             Container(
-              width: 120,
+              width: 140,
               height: 120,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
@@ -3937,8 +3861,13 @@ class LogoSplashScreen extends StatelessWidget {
               ),
               child: ClipOval(
                 child: Image.asset(
-                  'assets/icons/app_logo.png', // Update this path to your logo
-                  fit: BoxFit.cover,
+                  'assets/icons/dailylogo.jpg', // Use correct logo path
+                  fit: BoxFit.contain, // Changed to contain for full visibility
+                  width: 140,
+                  height: 120,
+                  alignment: Alignment.center,
+                  cacheWidth: 280,
+                  filterQuality: FilterQuality.high,
                   errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
                     return Icon(
                       Icons.calendar_today_rounded,
@@ -4238,34 +4167,60 @@ class _MonthlyContentState extends State<_MonthlyContent> {
     final ThemeData theme = Theme.of(context);
     final List<PanchangaDay> days = PanchangaDataUtils.daysForMonth(widget.month);
 
-    return Padding(
+    return SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          // Minimal text for maximum calendar space
-          Text(
-            PanchangaDataUtils.kannadaMonthLabel(widget.month),
-            style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.primary),
-          ),
-          Text(
-            '${widget.month.year}',
-            style: GoogleFonts.notoSansKannada(fontSize: 10, fontWeight: FontWeight.w500, color: theme.colorScheme.primary.withValues(alpha: 0.6)),
-          ),
-          const SizedBox(height: 1),
-          Expanded(
-            flex: 1000, // Maximum size - calendar covers entire screen
-            child: _MonthlyCalendarImage(
-              month: widget.month,
-              onTap: () => _openZoomableCalendar(context, widget.month),
+          // Month/Year header - above calendar, centered
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: Column(
+              children: <Widget>[
+                Text(
+                  PanchangaDataUtils.kannadaMonthLabel(widget.month),
+                  style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w700, color: theme.colorScheme.primary),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  '${widget.month.year}',
+                  style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w500, color: theme.colorScheme.primary.withValues(alpha: 0.7)),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 2), // Minimal spacing
+
+          // Fixed calendar image - no swiping
+          Container(
+            height: MediaQuery.of(context).size.height * 0.5, // 50% of screen height for calendar
+            margin: const EdgeInsets.only(bottom: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE0E7FF), width: 1.5),
+              boxShadow: const <BoxShadow>[
+                BoxShadow(color: Color(0x1A0F4AA3), blurRadius: 20, offset: Offset(0, 8)),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: _MonthlyCalendarImage(
+                month: widget.month,
+                onTap: () => _openZoomableCalendar(context, widget.month),
+              ),
+            ),
+          ),
+
+          // Special day highlights
           _MonthlyHighlights(
             month: widget.month,
             days: days,
           ),
-          const SizedBox(height: 4), // Reduced spacing
+
+          const SizedBox(height: 16),
+
+          // Action buttons
           Row(
             children: <Widget>[
               Expanded(
@@ -4276,7 +4231,7 @@ class _MonthlyContentState extends State<_MonthlyContent> {
                   theme: theme,
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 12),
               Expanded(
                 child: _MonthlyActionButton(
                   label: 'ಪಂಚಾಂಗ',
@@ -4287,6 +4242,8 @@ class _MonthlyContentState extends State<_MonthlyContent> {
               ),
             ],
           ),
+
+          const SizedBox(height: 16), // Bottom spacing for safe area
         ],
       ),
     );
@@ -4305,23 +4262,9 @@ class _MonthlyCalendarImage extends StatelessWidget {
     // Load monthly calendar image from network URL
     final String networkUrl = 'https://kannadacalendar.in/wp-content/kannada/monthly/${month.year}/${month.month.toString().padLeft(2, '0')}-${month.year}.jpg';
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.transparent, // Made transparent for full screen effect
-        borderRadius: BorderRadius.circular(8), // Reduced border radius for more screen space
-        border: Border.all(color: const Color(0xFFE0E7FF), width: 0.5), // Reduced border width
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(8), // Matching reduced border radius
-        child: SizedBox(
-          width: double.infinity,
-          height: double.infinity, // Take all available space
-          child: GestureDetector(
-            onTap: onTap,
-            child: _MonthlyCalendarFallback(url: networkUrl, onTap: onTap),
-          ),
-        ),
-      ),
+    return GestureDetector(
+      onTap: onTap,
+      child: _MonthlyCalendarFallback(url: networkUrl, onTap: onTap),
     );
   }
 }
@@ -4334,30 +4277,45 @@ class _MonthlyCalendarFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity, // Fill all available space
+    return SizedBox.expand(
       child: GestureDetector(
         onTap: onTap,
         child: Image.network(
           url,
-          fit: BoxFit.contain, // Changed to contain for full vertical visibility
+          fit: BoxFit.contain, // Changed from cover to contain for full image visibility
           width: double.infinity,
           height: double.infinity,
           loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? progress) {
             if (progress == null) {
               return child;
             }
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF0F4AA3)),
+              ),
+            );
           },
           errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
             return Container(
-              color: Colors.transparent, // Made transparent for consistency
+              color: const Color(0xFFF1F5F9),
               alignment: Alignment.center,
-              child: Text(
-                'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್\nಲಭ್ಯವಿಲ್ಲ',
-                style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF64748B)),
-                textAlign: TextAlign.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  const Icon(Icons.calendar_month_rounded, size: 48, color: Color(0xFF64748B)),
+                  const SizedBox(height: 12),
+                  Text(
+                    'ಮಾಸಿಕ ಕ್ಯಾಲೆಂಡರ್\nಲಭ್ಯವಿಲ್ಲ',
+                    style: GoogleFonts.notoSansKannada(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF64748B)),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'ಇಂಟರ್ನೆಟ್ ಸಂಪರ್ಕವನ್ನು\nಪರಿಶೀಲಿಸಿ',
+                    style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w500, color: const Color(0xFF94A3B8)),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             );
           },
@@ -4924,65 +4882,269 @@ class _MonthlyHighlights extends StatelessWidget {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final List<PanchangaDay> days = _days ?? PanchangaDataUtils.daysForMonth(month);
-    final List<PanchangaDay> festivalDays = days.where((PanchangaDay day) => (day.festivals?.isNotEmpty ?? false)).take(3).toList();
 
-    final PanchangaDay? amavasyaDay = _matchTithi(days, 'amavasya');
-    final PanchangaDay? purnimaDay = _matchTithi(days, 'purnima');
+    // Get comprehensive important dates
+    final Map<String, List<_ImportantDate>> importantDates = _getImportantDatesForMonth(month, days);
+
+    // Create a combined list of all important dates and sort chronologically
+    final List<_ImportantDate> allImportantDates = <_ImportantDate>[];
+    for (final List<_ImportantDate> categoryDates in importantDates.values) {
+      allImportantDates.addAll(categoryDates);
+    }
+
+    // Sort all dates chronologically by day of month
+    allImportantDates.sort((a, b) => a.date.day.compareTo(b.date.day));
 
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.94),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0xFFE0E7FF), width: 1.2),
         boxShadow: const <BoxShadow>[
-          BoxShadow(color: Color(0x140F172A), blurRadius: 18, offset: Offset(0, 10)),
+          BoxShadow(color: Color(0x140F172A), blurRadius: 16, offset: Offset(0, 8)),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-          Text(
-            'ಪ್ರಮುಖ ಸಂಭ್ರಮಗಳು',
-            style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF0F4AA3)),
+          Row(
+            children: <Widget>[
+              const Icon(Icons.celebration_rounded, size: 18, color: Color(0xFF0F4AA3)),
+              const SizedBox(width: 8),
+              Text(
+                'ಪ್ರಮುಖ ಸಂಭ್ರಮಗಳು',
+                style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF0F4AA3)),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: <Widget>[
-              if (festivalDays.isNotEmpty)
-                ...festivalDays.map(
-                  (PanchangaDay day) => _HighlightCard(
-                    title: day.festivals!.first,
-                    subtitle: DateFormat('d MMMM', 'kn_IN').format(day.date),
-                    accent: const Color(0xFFEA580C),
-                  ),
-                ),
-              if (amavasyaDay != null)
-                _HighlightCard(
-                  title: amavasyaDay.tithi,
-                  subtitle: DateFormat('d MMMM', 'kn_IN').format(amavasyaDay.date),
-                  accent: const Color(0xFF6366F1),
-                ),
-              if (purnimaDay != null)
-                _HighlightCard(
-                  title: purnimaDay.tithi,
-                  subtitle: DateFormat('d MMMM', 'kn_IN').format(purnimaDay.date),
-                  accent: const Color(0xFF22C55E),
-                ),
-              if (festivalDays.isEmpty && amavasyaDay == null && purnimaDay == null)
-                _HighlightCard(
-                  title: 'ಈ ತಿಂಗಳಲ್ಲಿิเศษ ಹಬ್ಬಗಳಿಲ್ಲ',
-                  subtitle: 'ಪಂಚಾಂಗ ವಿಷಯವನ್ನು ಅಪ್ಡೇಟ್ ಮಾಡಿ',
-                  accent: theme.colorScheme.secondary,
-                ),
-            ],
+          Container(
+            constraints: BoxConstraints(maxHeight: 90),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.start,
+                children: allImportantDates.isNotEmpty
+                  ? allImportantDates.map(
+                      (date) => _HighlightCard(
+                        title: _truncateText(date.name, 16),
+                        subtitle: DateFormat('d MMM', 'kn_IN').format(date.date),
+                        accent: date.color,
+                        category: _getCategoryIcon(date.category),
+                      ),
+                    ).toList()
+                  : <Widget>[
+                      _HighlightCard(
+                        title: _truncateText('ಈ ತಿಂಗಳಿನಲ್ಲಿ ಎನು ವಿಶೇಷ ಸಂಭ್ರಮಗಳಿಲ್ಲ', 16),
+                        subtitle: 'ಪಂಚಾಂಗ ವಿಷಯವನ್ನು ಅಪ್ಡೇಟ್ ಮಾಡಿ',
+                        accent: theme.colorScheme.secondary,
+                        category: '📋',
+                      ),
+                    ],
+              ),
+            ),
           ),
         ],
       ),
     );
+  }
+
+  Map<String, List<_ImportantDate>> _getImportantDatesForMonth(DateTime month, List<PanchangaDay> days) {
+    final Map<String, List<_ImportantDate>> importantDates = <String, List<_ImportantDate>>{
+      'national': <_ImportantDate>[],
+      'karnataka': <_ImportantDate>[],
+      'hindu': <_ImportantDate>[],
+      'other_religious': <_ImportantDate>[],
+      'moon_phases': <_ImportantDate>[],
+      'government': <_ImportantDate>[],
+    };
+
+    // National Festivals of India
+    final List<_ImportantDate> nationalFestivals = <_ImportantDate>[
+      // January
+      if (month.month == 1) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 1, 1), 'ಹೊಸ ವರ್ಷ', const Color(0xFFDC2626), 'national'),
+        _ImportantDate(DateTime(month.year, 1, 26), 'ಗಣರಾಜ್ಯೋತ್ಸವ', const Color(0xFFEA580C), 'national'),
+      ],
+      // March
+      if (month.month == 3) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 3, 8), 'ಅಂತರರಾಷ್ಟ್ರೀಯ ಮಹಿಳಾ ದಿನ', const Color(0xFF7C3AED), 'national'),
+      ],
+      // April
+      if (month.month == 4) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 4, 14), 'ಡಾ. ಬಿ.ಆರ್. ಅಂಬೇಡ್ಕರ್ ಜಯಂತಿ', const Color(0xFF059669), 'national'),
+      ],
+      // May
+      if (month.month == 5) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 5, 1), 'ಕಾರ್ಮಿಕರ ದಿನ', const Color(0xFFDC2626), 'national'),
+      ],
+      // August
+      if (month.month == 8) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 8, 15), 'ಸ್ವಾತಂತ್ರ್ಯ ದಿನ', const Color(0xFFEA580C), 'national'),
+      ],
+      // October
+      if (month.month == 10) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 10, 2), 'ಗಾಂಧಿ ಜಯಂತಿ', const Color(0xFF7C3AED), 'national'),
+      ],
+      // November
+      if (month.month == 11) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 11, 14), 'ಬಾಲಕರ ದಿನ', const Color(0xFF059669), 'national'),
+      ],
+      // December
+      if (month.month == 12) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 12, 25), 'ಕ್ರಿಸ್‌ಮಸ್', const Color(0xFFDC2626), 'national'),
+      ],
+    ];
+
+    // Karnataka State Festivals
+    final List<_ImportantDate> karnatakaFestivals = <_ImportantDate>[
+      // January
+      if (month.month == 1) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 1, 15), 'ಮಕರ ಸಂಕ್ರಾಂತಿ', const Color(0xFFEA580C), 'karnataka'),
+      ],
+      // March
+      if (month.month == 3) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 3, 23), 'ಶಹೀದರ ದಿನ', const Color(0xFF7C3AED), 'karnataka'),
+      ],
+      // April
+      if (month.month == 4) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 4, 1), 'ಕರ್ನಾಟಕ ರಾಜ್ಯೋತ್ಸವ', const Color(0xFFEA580C), 'karnataka'),
+      ],
+      // November
+      if (month.month == 11) ...<_ImportantDate>[
+        _ImportantDate(DateTime(month.year, 11, 1), 'ಕನ್ನಡ ರಾಜ್ಯೋತ್ಸವ', const Color(0xFFDC2626), 'karnataka'),
+      ],
+    ];
+
+    // Hindu Festivals (based on lunar calendar - simplified)
+    final List<_ImportantDate> hinduFestivals = <_ImportantDate>[
+      // Check for common Hindu festivals in the panchanga data
+      ...days.where((day) => day.festivals?.any((festival) =>
+        festival.contains('ದೀಪಾವಳಿ') ||
+        festival.contains('ದಸರಾ') ||
+        festival.contains('ಹೋಳಿ') ||
+        festival.contains('ಉಗಾದಿ') ||
+        festival.contains('ವಿನಾಯಕ') ||
+        festival.contains('ಗಣೇಶ') ||
+        festival.contains('ನವರಾತ್ರಿ') ||
+        festival.contains('ಕೃಷ್ಣ') ||
+        festival.contains('ರಾಮ') ||
+        festival.contains('ಶಿವರಾತ್ರಿ') ||
+        festival.contains('ಹನುಮ') ||
+        festival.contains('ದುರ್ಗಾ') ||
+        festival.contains('ಮಹಾಶಿವರಾತ್ರಿ') ||
+        festival.contains('ವಿಶ್ವಕರ್ಮ ಜಯಂತಿ') ||
+        festival.contains('ಸರಸ್ವತಿ ಪೂಜೆ') ||
+        festival.contains('ಲಕ್ಷ್ಮೀ ಪೂಜೆ') ||
+        festival.contains('ಸಂಕಷ್ಟಹರ ಚತುರ್ಥಿ') ||
+        festival.contains('ಅಂಗಾರಕ ಚತುರ್ಥಿ') ||
+        festival.contains('ಶ್ರೀಕೃಷ್ಣ ಜನ್ಮಾಷ್ಟಮಿ') ||
+        festival.contains('ಶ್ರೀರಾಮ ನವಮಿ')
+      ) ?? false).map((day) => _ImportantDate(
+        day.date,
+        day.festivals!.first,
+        const Color(0xFFEA580C),
+        'hindu'
+      )),
+    ];
+
+    // Other Religious Festivals
+    final List<_ImportantDate> otherReligiousFestivals = <_ImportantDate>[
+      // Muslim Festivals (approximate dates)
+      if (month.month == 1) _ImportantDate(DateTime(month.year, 1, 1), 'ಹಿಜ್ರಿ ಹೊಸ ವರ್ಷ', const Color(0xFF059669), 'other_religious'),
+      // Christian Festivals
+      if (month.month == 12) _ImportantDate(DateTime(month.year, 12, 25), 'ಕ್ರಿಸ್‌ಮಸ್', const Color(0xFFDC2626), 'other_religious'),
+      // Buddhist Festivals
+      if (month.month == 5) _ImportantDate(DateTime(month.year, 5, 15), 'ಬುದ್ಧ ಪೂರ್ಣಿಮಾ', const Color(0xFFF59E0B), 'other_religious'),
+    ];
+
+    // Moon Phases
+    final PanchangaDay? amavasyaDay = _matchTithi(days, 'amavasya');
+    final PanchangaDay? purnimaDay = _matchTithi(days, 'purnima');
+
+    final List<_ImportantDate> moonPhases = <_ImportantDate>[];
+    if (amavasyaDay != null) {
+      moonPhases.add(_ImportantDate(amavasyaDay.date, 'ಅಮಾವಾಸ್ಯೆ', const Color(0xFF6366F1), 'moon_phases'));
+    }
+    if (purnimaDay != null) {
+      moonPhases.add(_ImportantDate(purnimaDay.date, 'ಪೂರ್ಣಿಮೆ', const Color(0xFF22C55E), 'moon_phases'));
+    }
+
+    // Government & Important Days (excluding duplicates)
+    final List<_ImportantDate> governmentDays = <_ImportantDate>[
+      // International Days (only if not already in other categories)
+      if (month.month == 2) _ImportantDate(DateTime(month.year, 2, 14), 'ವ್ಯಾಲೆಂಟೈನ್ ದಿನ', const Color(0xFFEC4899), 'government'),
+      if (month.month == 6) _ImportantDate(DateTime(month.year, 6, 21), 'ಅಂತರರಾಷ್ಟ್ರೀಯ ಯೋಗ ದಿನ', const Color(0xFF059669), 'government'),
+      if (month.month == 9) _ImportantDate(DateTime(month.year, 9, 5), 'ಶಿಕ್ಷಕರ ದಿನ', const Color(0xFF3B82F6), 'government'),
+      if (month.month == 10) _ImportantDate(DateTime(month.year, 10, 31), 'ಹ್ಯಾಲೋವೀನ್', const Color(0xFFF97316), 'government'),
+    ];
+
+    // Filter and assign dates, avoiding duplicates
+    final Set<String> usedDates = <String>{}; // Track used dates as "month-day" strings
+
+    // Helper function to check and add dates
+    void addUniqueDates(String category, List<_ImportantDate> dates) {
+      for (final _ImportantDate date in dates) {
+        final String dateKey = '${date.date.month}-${date.date.day}';
+        if (!usedDates.contains(dateKey)) {
+          importantDates[category]!.add(date);
+          usedDates.add(dateKey);
+        }
+      }
+    }
+
+    // Add dates in order of priority and chronological order
+    addUniqueDates('national', nationalFestivals);
+    addUniqueDates('karnataka', karnatakaFestivals);
+    addUniqueDates('hindu', hinduFestivals);
+    addUniqueDates('other_religious', otherReligiousFestivals);
+    addUniqueDates('moon_phases', moonPhases);
+    addUniqueDates('government', governmentDays);
+
+    // Sort all dates chronologically within each category
+    for (final String category in importantDates.keys) {
+      importantDates[category]!.sort((a, b) => a.date.day.compareTo(b.date.day));
+    }
+
+    return importantDates;
+  }
+
+  String _truncateText(String text, int maxLength) {
+    if (text.length <= maxLength) {
+      return text;
+    }
+    // Try to truncate at word boundary if possible
+    final int spaceIndex = text.lastIndexOf(' ', maxLength - 4);
+    if (spaceIndex > maxLength - 8) {
+      return '${text.substring(0, spaceIndex)}...';
+    }
+    return '${text.substring(0, maxLength - 3)}...';
+  }
+
+  String _getCategoryIcon(String category) {
+    switch (category) {
+      case 'national':
+        return '🇮🇳';
+      case 'karnataka':
+        return '🏛️';
+      case 'hindu':
+        return '🕉️';
+      case 'other_religious':
+        return '🙏';
+      case 'moon_phases':
+        return '🌙';
+      case 'government':
+        return '📅';
+      default:
+        return '📋';
+    }
   }
 
   PanchangaDay? _matchTithi(List<PanchangaDay> days, String keyword) {
@@ -4996,44 +5158,89 @@ class _MonthlyHighlights extends StatelessWidget {
   }
 }
 
+class _ImportantDate {
+  const _ImportantDate(this.date, this.name, this.color, this.category);
+
+  final DateTime date;
+  final String name;
+  final Color color;
+  final String category;
+}
+
 class _HighlightCard extends StatelessWidget {
-  const _HighlightCard({required this.title, required this.subtitle, required this.accent});
+  const _HighlightCard({
+    required this.title,
+    required this.subtitle,
+    required this.accent,
+    this.category,
+  });
 
   final String title;
   final String subtitle;
   final Color accent;
+  final String? category;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 120,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      constraints: BoxConstraints(
+        minWidth: 85,
+        maxWidth: 110,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(8),
         gradient: LinearGradient(
           colors: <Color>[accent.withValues(alpha: 0.08), Colors.white],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        border: Border.all(color: accent.withValues(alpha: 0.24), width: 0.8),
+        border: Border.all(color: accent.withValues(alpha: 0.24), width: 1.0),
         boxShadow: <BoxShadow>[
-          BoxShadow(color: accent.withValues(alpha: 0.12), blurRadius: 8, offset: const Offset(0, 4)),
+          BoxShadow(color: accent.withValues(alpha: 0.08), blurRadius: 4, offset: const Offset(0, 2)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
+          if (category != null)
+            Container(
+              margin: const EdgeInsets.only(bottom: 2),
+              child: Text(
+                category!,
+                style: TextStyle(
+                  fontSize: 8,
+                  color: accent.withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           Text(
             title,
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.notoSansKannada(fontSize: 11, fontWeight: FontWeight.w700, color: _darken(accent, 0.15)),
+            style: GoogleFonts.notoSansKannada(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: _darken(accent, 0.15),
+              height: 1.1,
+            ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: GoogleFonts.notoSansKannada(fontSize: 9, fontWeight: FontWeight.w500, color: accent.withValues(alpha: 0.7)),
-          ),
+          if (subtitle.isNotEmpty) ...<Widget>[
+            const SizedBox(height: 1),
+            Text(
+              subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.notoSansKannada(
+                fontSize: 8,
+                fontWeight: FontWeight.w500,
+                color: accent.withValues(alpha: 0.7),
+                height: 1.0,
+              ),
+            ),
+          ],
         ],
       ),
     );

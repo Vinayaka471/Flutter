@@ -45,9 +45,7 @@ class AppTheme {
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        titleTextStyle: GoogleFonts.poppins(
-          fontWeight: FontWeight.w600,
-          fontSize: 20,
+        iconTheme: IconThemeData(
           color: colorScheme.onSurface,
         ),
       ),

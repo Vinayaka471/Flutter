@@ -12,6 +12,7 @@ import 'providers/reminder_provider.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/monthly_calendar_screen.dart';
+import 'screens/splash_screen.dart';
 import 'theme/app_theme.dart';
 
 import 'services/reminder_scheduler.dart';
@@ -53,7 +54,7 @@ class ShabadimathCalendarApp extends StatelessWidget {
       child: Consumer<calendar_app_state.AppState>(
         builder: (BuildContext context, calendar_app_state.AppState state, _) {
           return MaterialApp(
-            title: 'Shabadimath Calendar',
+            title: 'Kannada Calendar',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
@@ -69,8 +70,9 @@ class ShabadimathCalendarApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            home: const HomeScreen(),
+            home: const SplashScreen(),
             routes: <String, WidgetBuilder>{
+              '/home': (_) => const HomeScreen(),
               CalendarScreen.routeName: (_) => const CalendarScreen(),
               MonthlyCalendarScreen.routeName: (_) => const MonthlyCalendarScreen(),
             },

@@ -23,7 +23,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Shabadimath Calendar'), findsOneWidget);
+    expect(find.text('Kannada Calendar'), findsOneWidget);
     expect(find.text('Open Calendar'), findsOneWidget);
   });
 }

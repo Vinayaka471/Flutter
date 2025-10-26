@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Shabadimath Calendar</string>
+    <string name="app_name">Kannada Calendar</string>
     <string name="panchanga_title">ಪಂಚಾಂಗ</string>
     <string name="panchanga_image_content_description">Panchanga image</string>
     <string name="panchanga_loading">Loading Panchanga…</string>
