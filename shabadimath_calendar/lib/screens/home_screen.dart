@@ -2323,19 +2323,28 @@ class _FestivalsContent extends StatelessWidget {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  Text(
-                                    entry.formattedDate,
-                                    style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                                  Expanded(
+                                    child: Text(
+                                      entry.formattedDate,
+                                      style: GoogleFonts.notoSansKannada(fontSize: 16, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                                    ),
                                   ),
-                                  Row(
-                                    children: <Widget>[
-                                      const Icon(Icons.event_available_rounded, size: 18, color: Color(0xFF1D4ED8)),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        DateFormat.MMMd('kn_IN').format(entry.date),
-                                        style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface.withValues(alpha: 0.65)),
-                                      ),
-                                    ],
+                                  Container(
+                                    constraints: BoxConstraints(maxWidth: 100),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        const Icon(Icons.event_available_rounded, size: 16, color: Color(0xFF1D4ED8)),
+                                        const SizedBox(width: 4),
+                                        Flexible(
+                                          child: Text(
+                                            DateFormat.MMMd('kn_IN').format(entry.date),
+                                            style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface.withValues(alpha: 0.65)),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -2344,13 +2353,16 @@ class _FestivalsContent extends StatelessWidget {
                                 (String festival) => Padding(
                                   padding: const EdgeInsets.symmetric(vertical: 4),
                                   child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: <Widget>[
-                                      const Icon(Icons.star_rounded, size: 18, color: Color(0xFFF59E0B)),
-                                      const SizedBox(width: 10),
+                                      const Icon(Icons.star_rounded, size: 16, color: Color(0xFFF59E0B)),
+                                      const SizedBox(width: 8),
                                       Expanded(
                                         child: Text(
                                           festival,
-                                          style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w700),
+                                          style: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
@@ -2373,21 +2385,26 @@ class _FestivalsContent extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text(
-                      'ಸ್ಮರಣಿಕೆಗಳು',
-                      style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.secondary),
-                    ),
-                    ElevatedButton.icon(
-                      onPressed: () => _openReminderSheet(context, reminderProvider),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0F4AA3),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                        textStyle: GoogleFonts.notoSansKannada(fontSize: 14, fontWeight: FontWeight.w700),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    Expanded(
+                      child: Text(
+                        'ಸ್ಮರಣಿಕೆಗಳು',
+                        style: GoogleFonts.notoSansKannada(fontSize: 18, fontWeight: FontWeight.w800, color: theme.colorScheme.secondary),
                       ),
-                      icon: const Icon(Icons.add_rounded, size: 18),
-                      label: const Text('ಹೊಸ ರಿಮೈಂಡರ್'),
+                    ),
+                    Container(
+                      constraints: BoxConstraints(maxWidth: 150),
+                      child: ElevatedButton.icon(
+                        onPressed: () => _openReminderSheet(context, reminderProvider),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF0F4AA3),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          textStyle: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w700),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                        icon: const Icon(Icons.add_rounded, size: 16),
+                        label: const Text('ಹೊಸ ರಿಮೈಂಡರ್'),
+                      ),
                     ),
                   ],
                 ),
@@ -2685,25 +2702,38 @@ class _ReminderCard extends StatelessWidget {
                   children: <Widget>[
                     Text(
                       reminder.title,
-                      style: GoogleFonts.notoSansKannada(fontSize: 16.5, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                      style: GoogleFonts.notoSansKannada(fontSize: 15, fontWeight: FontWeight.w800, color: theme.colorScheme.primary),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
                       dateFormatter.format(reminder.date),
-                      style: GoogleFonts.notoSansKannada(fontSize: 13.5, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                      style: GoogleFonts.notoSansKannada(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              IconButton(
-                tooltip: 'ತಿದ್ದು',
-                onPressed: () => _FestivalsContent._openReminderSheet(context, provider, editing: reminder),
-                icon: const Icon(Icons.edit_rounded, color: Color(0xFF0F4AA3)),
-              ),
-              IconButton(
-                tooltip: 'ಅಳಿಸಿ',
-                onPressed: () => _confirmDelete(context),
-                icon: const Icon(Icons.delete_rounded, color: Color(0xFFB91C1C)),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  IconButton(
+                    tooltip: 'ತಿದ್ದು',
+                    onPressed: () => _FestivalsContent._openReminderSheet(context, provider, editing: reminder),
+                    icon: const Icon(Icons.edit_rounded, color: Color(0xFF0F4AA3), size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
+                  IconButton(
+                    tooltip: 'ಅಳಿಸಿ',
+                    onPressed: () => _confirmDelete(context),
+                    icon: const Icon(Icons.delete_rounded, color: Color(0xFFB91C1C), size: 20),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
+                ],
               ),
             ],
           ),
