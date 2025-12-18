@@ -12,4 +12,7 @@ void main() {
   M=Multiplication
   A=Adition
   S=Subtraction */
+
+  String value = '10';
+  print(value.length);
 }
