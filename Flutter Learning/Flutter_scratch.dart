@@ -16,6 +16,6 @@ void main() {
   String value = '10';
   print(value.length);
 
-  String name = 'Vinayaka';
+  String name = 'Vinayaka H';
   print(name.length);
 }
