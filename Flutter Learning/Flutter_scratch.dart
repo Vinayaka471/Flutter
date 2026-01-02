@@ -15,4 +15,7 @@ void main() {
 
   String value = '10';
   print(value.length);
+
+  String name = 'Vinayaka';
+  print(name.length);
 }
